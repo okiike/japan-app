@@ -654,7 +654,7 @@
 
         async function generateContentWithGemini(prompt) {
             showLoadingMessage("L'IA réfléchit...");
-            const apiKey = ""; 
+            const apiKey = "AIzaSyBu83wrvYvz9sQ3UU1E-3q4wokfQCcobuw"; 
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
             const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
             try {
