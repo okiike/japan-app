@@ -23,15 +23,25 @@
             --font-family-system: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
 
+        *, *::before, *::after { /* Global box-sizing reset */
+            box-sizing: border-box;
+        }
+
+        html {
+            height: 100%;
+            overflow-y: hidden; /* Prevent scroll on html, body/main-content will handle it */
+        }
+
         body {
             font-family: var(--font-family-system);
             margin: 0;
+            padding: 0; /* Ensure no default padding */
             background-color: var(--bg-color);
             color: var(--text-color-primary);
             display: flex;
             flex-direction: column;
-            height: 100vh;
-            overflow: hidden; 
+            height: 100%; /* Use 100% of html height, more stable on mobile */
+            /* overflow: hidden; Removed, let main-content handle its scroll */
         }
 
         .status-bar-placeholder {
@@ -41,17 +51,18 @@
         }
 
         .main-content {
-            flex: 1;
+            flex: 1; /* Takes up available space */
             overflow-y: auto; 
-            position: relative;
+            position: relative; /* For positioning of loading/error messages */
+            -webkit-overflow-scrolling: touch; /* Smoother scrolling on iOS */
         }
 
         .screen {
             display: none;
             padding: 20px; 
             background-color: var(--bg-color); 
-            height: 100%;
-            box-sizing: border-box;
+            /* height: 100%; Removed, let content define height within scrollable main-content */
+            /* box-sizing: border-box; Already global */
         }
 
         .screen.active {
@@ -62,6 +73,7 @@
             font-size: 28px; 
             font-weight: 600; 
             color: var(--text-color-primary);
+            margin-top: 0; /* Adjust if status bar placeholder creates too much space */
             margin-bottom: 25px;
             text-align: center;
         }
@@ -81,14 +93,17 @@
             height: 65px; 
             border-top: 1px solid var(--border-color);
             background-color: var(--secondary-bg-color); 
-            flex-shrink: 0;
-            padding-bottom: env(safe-area-inset-bottom); 
+            flex-shrink: 0; /* Prevents shrinking */
+            padding-bottom: env(safe-area-inset-bottom); /* Crucial for iPhone X+ bottom bar */
+            position: relative; /* Or sticky if needed, but flex should suffice */
+            z-index: 100; /* Ensure it's above other content if overlap occurs */
         }
 
         .tab-item {
             flex: 1; display: flex; flex-direction: column;
             justify-content: center; align-items: center;
-            cursor: pointer; padding: 5px 0; border: none;
+            cursor: pointer; padding-top: 5px; padding-bottom: 5px; /* Adjusted padding */
+            border: none;
             background: none; transition: background-color 0.2s ease-in-out;
             color: var(--icon-color); 
         }
@@ -103,7 +118,7 @@
             flex: 1; background-color: var(--secondary-bg-color);
             color: var(--text-color-primary); border: 1px solid var(--border-color);
             border-radius: 8px; padding: 12px 15px; font-size: 16px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            /* box-shadow: 0 1px 2px rgba(0,0,0,0.05); Removed as it's minor */
         }
         .text-input::placeholder { color: var(--text-color-tertiary); }
 
@@ -123,9 +138,11 @@
             overflow-y: auto; background-color: var(--secondary-bg-color); 
             border-radius: 10px; padding: 0px; margin-bottom: 10px;
         }
-        .checklist-scroll-container { max-height: calc(100vh - 300px); }
-        .cities-scroll-container { max-height: calc(100vh - 250px); }
-        .info-scroll-container { max-height: calc(100vh - 160px); }
+        /* max-height calculations might need adjustment based on actual screen space */
+        .checklist-scroll-container { max-height: calc(100vh - 320px); } /* Adjusted for potential smaller viewports */
+        .cities-scroll-container { max-height: calc(100vh - 270px); } /* Adjusted */
+        .info-scroll-container { max-height: calc(100vh - 180px); } /* Adjusted */
+
 
         .list-item { 
             display: flex; align-items: center;
@@ -225,7 +242,8 @@
         .converter-row span { font-size: 16px; color: var(--text-color-secondary); }
 
         .loading-message, .error-message {
-            position: fixed; bottom: 80px; left: 50%;
+            position: fixed; bottom: 80px; /* Positioned above tab bar */
+            left: 50%;
             transform: translateX(-50%);
             background-color: rgba(50, 50, 50, 0.85); 
             backdrop-filter: blur(5px); color: white;
@@ -338,19 +356,19 @@
             speaker: '<svg class="svg-icon small" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M3 9V15H7L12 20V4L7 9H3ZM16.5 12C16.5 10.23 15.48 8.71 14 7.97V16.02C15.48 15.29 16.5 13.77 16.5 12ZM14 3.23V5.29C16.89 6.15 19 8.83 19 12C19 15.17 16.89 17.84 14 18.7V20.77C18.01 19.86 21 16.28 21 12C21 7.72 18.01 4.14 14 3.23Z"/></svg>'
         };
 
-        const LOCAL_STORAGE_KEY = 'japanTripPlannerData';
+        const LOCAL_STORAGE_KEY = 'japanTripPlannerData_v2'; // Changed key to avoid conflicts if old data structure exists
         let currentExchangeRate = 160; 
         
         // --- Données par défaut ---
-        let checklistItems = [ { id: '1', text: 'Réserver les vols', completed: false }, { id: '2', text: 'Réserver les hébergements', completed: false }];
+        let checklistItems = [ { id: 'checklist-1', text: 'Réserver les vols', completed: false }, { id: 'checklist-2', text: 'Réserver les hébergements', completed: false }];
         let citiesData = [ 
-            { id: 'tokyo', name: 'Tokyo', isExpanded: false, attractions: [{ id:'t1', text: 'Traversée de Shibuya', category: 'Point d\'intérêt', price: 'Gratuit', completed: false },{ id:'t2', text: 'Tour de Tokyo', category: 'Monument', price: '¥¥', completed: false }] },
-            { id: 'kyoto', name: 'Kyoto', isExpanded: false, attractions: [{ id:'k1', text: 'Kinkaku-ji (Pavillon d\'Or)', category: 'Culturel', price: '¥', completed: false }] }
+            { id: 'city-tokyo', name: 'Tokyo', isExpanded: false, attractions: [{ id:'attr-t1', text: 'Traversée de Shibuya', category: 'Point d\'intérêt', price: 'Gratuit', completed: false },{ id:'attr-t2', text: 'Tour de Tokyo', category: 'Monument', price: '¥¥', completed: false }] },
+            { id: 'city-kyoto', name: 'Kyoto', isExpanded: false, attractions: [{ id:'attr-k1', text: 'Kinkaku-ji (Pavillon d\'Or)', category: 'Culturel', price: '¥', completed: false }] }
         ];
         let usefulWords = [ 
-            { text: "Bonjour", translation: "こんにちは", isAISuggestion: false, lang: "ja-JP" },
-            { text: "Merci", translation: "ありがとう", isAISuggestion: false, lang: "ja-JP" },
-            { text: "S'il vous plaît", translation: "おねがいします", isAISuggestion: false, lang: "ja-JP" }
+            { id: 'word-1', text: "Bonjour", translation: "こんにちは", isAISuggestion: false, lang: "ja-JP" },
+            { id: 'word-2', text: "Merci", translation: "ありがとう", isAISuggestion: false, lang: "ja-JP" },
+            { id: 'word-3', text: "S'il vous plaît", translation: "おねがいします", isAISuggestion: false, lang: "ja-JP" }
         ];
 
         const domElements = {
@@ -397,15 +415,37 @@
             if (savedData) {
                 try {
                     const parsedData = JSON.parse(savedData);
-                    // Vérifier que les données parsées ont bien les clés attendues
-                    if (parsedData.checklist) checklistItems = parsedData.checklist;
-                    if (parsedData.cities) citiesData = parsedData.cities;
-                    if (parsedData.words) usefulWords = parsedData.words;
+                    // Ensure loaded data has IDs if they were missing in older versions
+                    checklistItems = (parsedData.checklist || []).map((item, index) => ({ ...item, id: item.id || `checklist-${Date.now()}-${index}` }));
+                    citiesData = (parsedData.cities || []).map((city, index) => ({ 
+                        ...city, 
+                        id: city.id || `city-${Date.now()}-${index}`,
+                        attractions: (city.attractions || []).map((attr, attrIndex) => ({...attr, id: attr.id || `attr-${Date.now()}-${attrIndex}`}))
+                    }));
+                    usefulWords = (parsedData.words || []).map((word, index) => ({ ...word, id: word.id || `word-${Date.now()}-${index}` }));
+
                 } catch (error) {
                     console.error("Erreur lors du chargement des données sauvegardées:", error);
-                    localStorage.removeItem(LOCAL_STORAGE_KEY); // Supprimer les données corrompues
+                    // localStorage.removeItem(LOCAL_STORAGE_KEY); // Optionally clear corrupted data
+                    // Fallback to default data if loading fails catastrophically
+                    initializeDefaultDataArrays();
                 }
+            } else {
+                 initializeDefaultDataArrays();
             }
+        }
+
+        function initializeDefaultDataArrays() {
+            checklistItems = [ { id: `checklist-${Date.now()}-1`, text: 'Réserver les vols', completed: false }, { id: `checklist-${Date.now()}-2`, text: 'Réserver les hébergements', completed: false }];
+            citiesData = [ 
+                { id: `city-${Date.now()}-tokyo`, name: 'Tokyo', isExpanded: false, attractions: [{ id:`attr-${Date.now()}-t1`, text: 'Traversée de Shibuya', category: 'Point d\'intérêt', price: 'Gratuit', completed: false },{ id:`attr-${Date.now()}-t2`, text: 'Tour de Tokyo', category: 'Monument', price: '¥¥', completed: false }] },
+                { id: `city-${Date.now()}-kyoto`, name: 'Kyoto', isExpanded: false, attractions: [{ id:`attr-${Date.now()}-k1`, text: 'Kinkaku-ji (Pavillon d\'Or)', category: 'Culturel', price: '¥', completed: false }] }
+            ];
+            usefulWords = [ 
+                { id: `word-${Date.now()}-1`, text: "Bonjour", translation: "こんにちは", isAISuggestion: false, lang: "ja-JP" },
+                { id: `word-${Date.now()}-2`, text: "Merci", translation: "ありがとう", isAISuggestion: false, lang: "ja-JP" },
+                { id: `word-${Date.now()}-3`, text: "S'il vous plaît", translation: "おねがいします", isAISuggestion: false, lang: "ja-JP" }
+            ];
         }
         
         function showLoadingMessage(message = "Chargement...") {
@@ -423,17 +463,29 @@
 
         async function generateContentWithGemini(prompt) {
             showLoadingMessage("L'IA réfléchit...");
-            const apiKey = ""; // La clé sera injectée par l'environnement d'exécution
+            const apiKey = "AIzaSyBu83wrvYvz9sQ3UU1E-3q4wokfQCcobuw"; // API Key inserted here
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
             const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
             try {
                 const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                if (!response.ok) { const errorData = await response.json(); throw new Error(errorData?.error?.message || "Erreur API Gemini."); }
+                if (!response.ok) { 
+                    const errorData = await response.json(); 
+                    console.error("Gemini API Error Full Response:", errorData);
+                    throw new Error(errorData?.error?.message || `Erreur API Gemini (${response.status})`); 
+                }
                 const result = await response.json();
                 hideLoadingMessage();
-                if (result.candidates?.[0]?.content?.parts?.[0]?.text) { return result.candidates[0].content.parts[0].text; }
-                throw new Error("Réponse IA inattendue.");
-            } catch (error) { console.error("Erreur API Gemini:", error); showErrorMessage(error.message); hideLoadingMessage(); throw error; }
+                if (result.candidates?.[0]?.content?.parts?.[0]?.text) { 
+                    return result.candidates[0].content.parts[0].text; 
+                }
+                console.warn("Gemini API - Réponse inattendue:", result);
+                throw new Error("Réponse IA inattendue ou vide.");
+            } catch (error) { 
+                console.error("Erreur fonction generateContentWithGemini:", error); 
+                showErrorMessage(error.message); 
+                hideLoadingMessage(); 
+                throw error; 
+            }
         }
 
         function setActiveScreen(screenId) {
@@ -443,9 +495,10 @@
         domElements.tabItems.forEach(tab => tab.addEventListener('click', () => setActiveScreen(tab.dataset.screen)));
 
         function renderChecklistItems() {
+            if (!domElements.checklistItemsContainer) return;
             domElements.checklistItemsContainer.innerHTML = '';
             checklistItems.forEach(item => {
-                const div = document.createElement('div'); div.className = 'list-item checklist-item';
+                const div = document.createElement('div'); div.className = 'list-item checklist-item';  div.dataset.id = item.id;
                 const contentDiv = document.createElement('div'); contentDiv.className = 'checklist-item-content';
                 const checkboxPlaceholder = document.createElement('span'); checkboxPlaceholder.className = 'checkbox-placeholder';
                 checkboxPlaceholder.innerHTML = item.completed ? icons.checkboxChecked : icons.checkboxEmpty;
@@ -465,7 +518,7 @@
         function deleteChecklistItem(id) { checklistItems = checklistItems.filter(i => i.id !== id); renderChecklistItems(); saveData(); }
         function addChecklistItem() {
             const text = domElements.newItemInput.value.trim(); if (text === '') return;
-            checklistItems.push({ id: Date.now().toString(), text: text, completed: false });
+            checklistItems.push({ id: `checklist-${Date.now()}`, text: text, completed: false });
             domElements.newItemInput.value = ''; renderChecklistItems(); saveData();
         }
         domElements.addItemButton.addEventListener('click', addChecklistItem);
@@ -473,23 +526,24 @@
         
         async function suggestNewTasks() {
             const existingTasksText = checklistItems.map(item => `- ${item.text}`).join('\n');
-            const prompt = `Je planifie un voyage au Japon. Ma checklist actuelle:\n${existingTasksText}\n\nSuggère 3 tâches de préparation importantes et concises. Ne répète pas. Une tâche par ligne, sans tiret.`;
+            const prompt = `Je planifie un voyage au Japon. Ma checklist actuelle:\n${existingTasksText}\n\nSuggère 3 tâches de préparation importantes et concises pour un voyage au Japon. Ne répète pas les tâches existantes. Une tâche par ligne, sans tiret ni numérotation.`;
             try {
                 const suggestionsText = await generateContentWithGemini(prompt);
                 suggestionsText.split('\n').filter(task => task.trim() !== '').forEach(taskText => {
                     if (!checklistItems.some(item => item.text.toLowerCase() === taskText.toLowerCase().trim())) {
-                        checklistItems.push({ id: Date.now().toString() + Math.random(), text: taskText.trim(), completed: false, isAISuggestion: true });
+                        checklistItems.push({ id: `checklist-ai-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`, text: taskText.trim(), completed: false, isAISuggestion: true });
                     }
                 });
                 renderChecklistItems(); saveData();
-            } catch (error) { console.error("Erreur suggestion tâches:", error); }
+            } catch (error) { console.error("Erreur suggestion tâches:", error); /* Message d'erreur déjà géré par generateContentWithGemini */ }
         }
         domElements.suggestTasksButton.addEventListener('click', suggestNewTasks);
 
         function renderCities() {
+            if (!domElements.citiesListContainer) return;
             domElements.citiesListContainer.innerHTML = '';
             citiesData.forEach(city => {
-                const cityCard = document.createElement('div'); cityCard.className = 'city-container';
+                const cityCard = document.createElement('div'); cityCard.className = 'city-container'; cityCard.dataset.id = city.id;
                 const header = document.createElement('div'); header.className = 'city-header';
                 const headerMain = document.createElement('div'); headerMain.className = 'city-header-main';
                 headerMain.innerHTML = `<span class="city-name">${city.name}</span>`;
@@ -517,12 +571,12 @@
                         if (!acc[category]) acc[category] = []; acc[category].push(attraction); return acc;
                     }, {});
 
-                    for (const category in attractionsByCategory) {
+                    Object.keys(attractionsByCategory).sort().forEach(category => {
                         const categoryDiv = document.createElement('div'); categoryDiv.className = 'attraction-category';
                         const categoryTitle = document.createElement('h3'); categoryTitle.className = 'attraction-category-title'; categoryTitle.textContent = category;
                         categoryDiv.appendChild(categoryTitle);
-                        attractionsByCategory[category].forEach(attraction => {
-                            const itemDiv = document.createElement('div'); itemDiv.className = 'list-item attraction-item';
+                        attractionsByCategory[category].sort((a,b) => a.text.localeCompare(b.text)).forEach(attraction => {
+                            const itemDiv = document.createElement('div'); itemDiv.className = 'list-item attraction-item'; itemDiv.dataset.id = attraction.id;
                             const checkboxPlaceholder = document.createElement('span'); checkboxPlaceholder.className = 'attraction-checkbox-placeholder';
                             checkboxPlaceholder.innerHTML = attraction.completed ? icons.checkboxChecked : icons.checkboxEmpty;
                             
@@ -548,7 +602,7 @@
                             categoryDiv.appendChild(itemDiv);
                         });
                         attractionsContainer.appendChild(categoryDiv);
-                    }
+                    });
                 }
                 cityCard.appendChild(header); cityCard.appendChild(attractionsContainer);
                 domElements.citiesListContainer.appendChild(cityCard);
@@ -559,36 +613,56 @@
             const cityName = domElements.newCityInput.value.trim();
             if (cityName === '') { showErrorMessage("Le nom de la ville est requis."); return; }
             if (citiesData.some(city => city.name.toLowerCase() === cityName.toLowerCase())) { showErrorMessage("Cette ville existe déjà."); return; }
-            citiesData.push({ id: cityName.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now(), name: cityName, isExpanded: false, attractions: [] });
+            citiesData.push({ id: `city-${cityName.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`, name: cityName, isExpanded: false, attractions: [] });
             domElements.newCityInput.value = ''; renderCities(); saveData();
         }
         domElements.addCityButton.addEventListener('click', addCity);
         domElements.newCityInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') addCity(); });
         function deleteCity(cityId) { citiesData = citiesData.filter(city => city.id !== cityId); renderCities(); saveData(); }
+        
         function toggleCityAttractionCompleted(cityId, attractionId) {
             const city = citiesData.find(c => c.id === cityId);
-            if (city) { const attraction = city.attractions.find(a => a.id === attractionId); if (attraction) { attraction.completed = !attraction.completed; renderCities(); saveData(); }}
+            if (city) { 
+                const attraction = (city.attractions || []).find(a => a.id === attractionId); 
+                if (attraction) { 
+                    attraction.completed = !attraction.completed; 
+                    renderCities(); 
+                    saveData(); 
+                }
+            }
         }
         function deleteCityAttraction(cityId, attractionId) {
             const city = citiesData.find(c => c.id === cityId);
-            if (city) { city.attractions = city.attractions.filter(a => a.id !== attractionId); renderCities(); saveData(); }
+            if (city) { 
+                city.attractions = (city.attractions || []).filter(a => a.id !== attractionId); 
+                renderCities(); 
+                saveData(); 
+            }
         }
         async function suggestCityAttractions(cityId) {
             const city = citiesData.find(c => c.id === cityId); if (!city) return;
             const existingAttractionsText = (city.attractions || []).map(attr => `- ${attr.text}`).join('\n');
-            const prompt = `Pour ${city.name}, Japon, suggère 2-3 activités/lieux en plus de:\n${existingAttractionsText}\n\nFormat: NOM;CATEGORIE;PRIX (Gratuit,¥,¥¥,¥¥¥,N/A). Concis. Ex: Temple Zuisen-ji;Culturel;¥`;
+            const prompt = `Pour la ville de ${city.name} au Japon, suggère 2-3 activités ou lieux touristiques intéressants, en plus de ceux-ci (s'il y en a):\n${existingAttractionsText}\n\nPour chaque suggestion, donne le nom, une catégorie (ex: Culturel, Nature, Nourriture, Shopping, Point d'intérêt, Monument), et une estimation de prix (Gratuit, ¥, ¥¥, ¥¥¥, ou N/A si non applicable).
+Ne répète pas les attractions existantes.
+Format exact pour chaque suggestion (une par ligne): NOM_ATTRACTION;CATEGORIE;PRIX
+Exemple: Temple Senso-ji;Culturel;Gratuit`;
             try {
                 const suggestionsText = await generateContentWithGemini(prompt);
+                if (!city.attractions) city.attractions = []; // Ensure attractions array exists
                 suggestionsText.split('\n').filter(attr => attr.trim() !== '' && attr.includes(';')).forEach(rawAttrText => {
                     const parts = rawAttrText.split(';');
-                    const text = parts[0]?.trim() || "Suggestion IA";
-                    const category = parts[1]?.trim() || "Suggestion";
-                    const price = parts[2]?.trim() || "N/A";
-                    if (!city.attractions.some(ea => ea.text.toLowerCase().includes(text.toLowerCase()))) {
-                        city.attractions.push({ id: city.id + '_ai_' + Date.now() + Math.random(), text, category, price, completed: false, isAISuggestion: true });
+                    if (parts.length >= 3) { // Ensure all parts are present
+                        const text = parts[0]?.trim();
+                        const category = parts[1]?.trim() || "Suggestion";
+                        const price = parts[2]?.trim() || "N/A";
+                        if (text && !city.attractions.some(ea => ea.text.toLowerCase().includes(text.toLowerCase()))) {
+                            city.attractions.push({ id: `attr-ai-${city.id}-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`, text, category, price, completed: false, isAISuggestion: true });
+                        }
                     }
                 });
-                if (!city.isExpanded) city.isExpanded = true; renderCities(); saveData();
+                if (!city.isExpanded) city.isExpanded = true; 
+                renderCities(); 
+                saveData();
             } catch (error) { console.error(`Erreur suggestion pour ${city.name}:`, error); }
         }
         
@@ -604,7 +678,7 @@
 
         function speak(text, lang = 'ja-JP') {
             if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
+                window.speechSynthesis.cancel(); // Cancel any ongoing speech
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = lang; utterance.rate = 0.9; 
                 window.speechSynthesis.speak(utterance);
@@ -614,7 +688,7 @@
             if (!domElements.usefulWordsListDiv) return;
             domElements.usefulWordsListDiv.innerHTML = ''; 
             usefulWords.forEach(word => {
-                const p = document.createElement('p'); p.className = 'info-list-item';
+                const p = document.createElement('p'); p.className = 'info-list-item'; p.dataset.id = word.id;
                 if (word.isAISuggestion) p.classList.add('ai-suggestion');
                 const textSpan = document.createElement('span'); textSpan.textContent = `• ${word.text}: ${word.translation}`;
                 const speakerIconPlaceholder = document.createElement('span'); speakerIconPlaceholder.className = 'speaker-icon-placeholder';
@@ -627,21 +701,21 @@
         }
         async function suggestNewWords() {
             const existingWordsText = usefulWords.map(word => `- ${word.text}: ${word.translation}`).join('\n');
-            const prompt = `Je planifie un voyage au Japon. Mots/phrases utiles actuels:\n${existingWordsText}\n\nSuggère 3-5 autres mots ou courtes phrases japonaises utiles pour un touriste. Pour chaque suggestion:
+            const prompt = `Je planifie un voyage au Japon. Voici des mots/phrases que je connais déjà :\n${existingWordsText}\n\nSuggère 3-5 autres mots ou courtes phrases japonaises utiles pour un touriste. Pour chaque suggestion:
 1. Le terme en français.
-2. Sa traduction STRICTEMENT en caractères japonais (Hiragana, Katakana, Kanji uniquement - pas de romaji, pas de notes).
-Sépare le français et le japonais par un DEUX-POINTS.
-Format: TERME_FRANCAIS: TRADUCTION_JAPONAISE_PURE
-Exemple: Combien ça coûte ?: いくらですか`;
+2. Sa traduction STRICTEMENT en caractères japonais (Hiragana, Katakana, Kanji uniquement - pas de romaji, pas de notes explicatives dans la traduction).
+Sépare le français et le japonais par un DEUX-POINTS. Ne répète pas les mots existants.
+Format exact: TERME_FRANCAIS: TRADUCTION_JAPONAISE_PURE
+Exemple: Où sont les toilettes ?: トイレはどこですか`;
             try {
                 const suggestionsText = await generateContentWithGemini(prompt);
                 suggestionsText.split('\n').filter(line => line.trim() !== '' && line.includes(':')).forEach(rawLine => {
                     const parts = rawLine.split(':');
                     if (parts.length >= 2) {
                         const textFr = parts[0].trim();
-                        const translationJp = parts.slice(1).join(':').trim();
-                        if (!usefulWords.some(w => w.text.toLowerCase() === textFr.toLowerCase() || w.translation.toLowerCase() === translationJp.toLowerCase())) {
-                            usefulWords.push({ text: textFr, translation: translationJp, isAISuggestion: true, lang: 'ja-JP' });
+                        const translationJp = parts.slice(1).join(':').trim(); // Handle colons in translation
+                        if (textFr && translationJp && !usefulWords.some(w => w.text.toLowerCase() === textFr.toLowerCase() || w.translation.toLowerCase() === translationJp.toLowerCase())) {
+                            usefulWords.push({ id: `word-ai-${Date.now()}-${Math.random().toString(36).substr(2,5)}`, text: textFr, translation: translationJp, isAISuggestion: true, lang: 'ja-JP' });
                         }
                     }
                 });
@@ -659,7 +733,7 @@ Exemple: Combien ça coûte ?: いくらですか`;
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            loadData(); // Charger les données sauvegardées en premier
+            loadData(); 
             initIcons(); 
             setActiveScreen('checklistScreen');
             renderChecklistItems();
