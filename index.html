@@ -18,8 +18,8 @@
             --highlight-color: #ff9f0a; 
             --border-color: #38383a; 
             --separator-color: #38383a; 
-            --icon-color: var(--text-color-tertiary); /* Couleur par défaut des icônes */
-            --icon-active-color: var(--accent-color); /* Couleur des icônes actives */
+            --icon-color: var(--text-color-tertiary);
+            --icon-active-color: var(--accent-color);
             --font-family-system: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
 
@@ -66,11 +66,9 @@
             text-align: center;
         }
 
-        /* Icônes SVG génériques */
         .svg-icon {
-            width: 20px; /* Taille par défaut, peut être surchargée */
-            height: 20px;
-            fill: currentColor; /* Permet de contrôler la couleur via CSS 'color' */
+            width: 20px; height: 20px;
+            fill: currentColor;
             display: inline-block;
             vertical-align: middle;
         }
@@ -78,7 +76,6 @@
         .svg-icon.medium { width: 22px; height: 22px; }
         .svg-icon.large { width: 26px; height: 26px; }
 
-        /* Styles pour la barre d'onglets */
         .tab-bar {
             display: flex;
             height: 65px; 
@@ -89,67 +86,32 @@
         }
 
         .tab-item {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            padding: 5px 0;
-            border: none;
-            background: none;
-            transition: background-color 0.2s ease-in-out;
+            flex: 1; display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            cursor: pointer; padding: 5px 0; border: none;
+            background: none; transition: background-color 0.2s ease-in-out;
             color: var(--icon-color); 
         }
         .tab-item:hover { background-color: var(--tertiary-bg-color); }
-
-        .tab-item .icon-placeholder {
-            margin-bottom: 3px;
-            height: 26px; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .tab-item .tab-label {
-            font-size: 10px; 
-            color: var(--text-color-tertiary);
-        }
-
+        .tab-item .icon-placeholder { margin-bottom: 3px; height: 26px; display: flex; align-items: center; justify-content: center; }
+        .tab-item .tab-label { font-size: 10px; color: var(--text-color-tertiary); }
         .tab-item.active { color: var(--icon-active-color); }
         .tab-item.active .tab-label { color: var(--accent-color); }
 
-        /* Styles pour les conteneurs d'input et boutons */
-        .input-container {
-            display: flex;
-            margin-bottom: 15px;
-            gap: 10px; 
-        }
-
+        .input-container { display: flex; margin-bottom: 15px; gap: 10px; }
         .text-input {
-            flex: 1;
-            background-color: var(--secondary-bg-color);
-            color: var(--text-color-primary);
-            border: 1px solid var(--border-color);
-            border-radius: 8px; 
-            padding: 12px 15px; 
-            font-size: 16px;
+            flex: 1; background-color: var(--secondary-bg-color);
+            color: var(--text-color-primary); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 12px 15px; font-size: 16px;
             box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
         .text-input::placeholder { color: var(--text-color-tertiary); }
 
         .button {
-            color: #ffffff;
-            padding: 12px 18px;
-            border-radius: 8px;
-            border: none;
-            font-size: 16px;
-            font-weight: 500; 
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            color: #ffffff; padding: 12px 18px; border-radius: 8px;
+            border: none; font-size: 16px; font-weight: 500; 
+            cursor: pointer; display: flex; align-items: center;
+            justify-content: center; gap: 8px;
             transition: background-color 0.2s ease;
         }
         .add-button { background-color: var(--accent-color); }
@@ -157,267 +119,130 @@
         .button:hover { filter: brightness(1.15); }
         .ai-button { margin-bottom: 20px; }
 
-        /* Styles pour les listes (Checklist et Villes) */
         .scroll-container { 
-            overflow-y: auto;
-            background-color: var(--secondary-bg-color); 
-            border-radius: 10px; 
-            padding: 0px;
-            margin-bottom: 10px;
+            overflow-y: auto; background-color: var(--secondary-bg-color); 
+            border-radius: 10px; padding: 0px; margin-bottom: 10px;
         }
-        .checklist-scroll-container { max-height: calc(100vh - 300px - 20px); /* Adjusted for user ID display */ }
-        .cities-scroll-container { max-height: calc(100vh - 250px - 20px); /* Adjusted for user ID display */ }
-        .info-scroll-container { max-height: calc(100vh - 160px - 20px); /* Adjusted for user ID display */ }
+        .checklist-scroll-container { max-height: calc(100vh - 300px); }
+        .cities-scroll-container { max-height: calc(100vh - 250px); }
+        .info-scroll-container { max-height: calc(100vh - 160px); }
 
         .list-item { 
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
-            background-color: transparent; 
+            display: flex; align-items: center;
+            padding: 12px 15px; background-color: transparent; 
             border-bottom: 1px solid var(--separator-color);
         }
         .list-item:last-child { border-bottom: none; }
-        
-        .checklist-item-content {
-            display: flex;
-            align-items: center;
-            flex-grow: 1;
-            cursor: pointer;
-        }
+        .checklist-item-content { display: flex; align-items: center; flex-grow: 1; cursor: pointer; }
         .checkbox-placeholder, .attraction-checkbox-placeholder { 
-            width: 22px;
-            height: 22px;
-            margin-right: 15px; 
-            color: var(--accent-color);
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 22px; height: 22px; margin-right: 15px; 
+            color: var(--accent-color); flex-shrink: 0; display: flex;
+            align-items: center; justify-content: center;
         }
         .checklist-item-text, .attraction-text {
-            font-size: 17px;
-            color: var(--text-color-secondary);
-            line-height: 1.4;
-            word-break: break-word; /* Allow long text to wrap */
+            font-size: 17px; color: var(--text-color-secondary); line-height: 1.4; word-break: break-word;
         }
-        .checklist-item-text.completed, .attraction-text.completed {
-            text-decoration: line-through;
-            color: var(--text-color-tertiary);
-        }
+        .checklist-item-text.completed, .attraction-text.completed { text-decoration: line-through; color: var(--text-color-tertiary); }
         
         .delete-button-placeholder { 
-            padding: 8px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: var(--destructive-color);
-            margin-left: auto; 
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            padding: 8px; background: none; border: none;
+            cursor: pointer; color: var(--destructive-color);
+            margin-left: auto; flex-shrink: 0; display: flex;
+            align-items: center; justify-content: center;
             transition: opacity 0.2s ease;
         }
         .delete-button-placeholder:hover { opacity: 0.7; }
 
-        /* Styles spécifiques pour Villes */
         .city-container { 
-            margin-bottom: 0; 
             background-color: var(--secondary-bg-color); 
-            border-radius: 10px;
-            overflow: hidden; 
-            margin-bottom: 10px; 
+            border-radius: 10px; overflow: hidden; margin-bottom: 10px; 
         }
         .city-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px; 
-            background-color: var(--tertiary-bg-color); 
-            cursor: pointer;
-            border-bottom: 1px solid var(--border-color); 
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px; background-color: var(--tertiary-bg-color); 
+            cursor: pointer; border-bottom: 1px solid var(--border-color); 
         }
         .city-header:hover { background-color: #4a4a4c; }
-
-        .city-header-main {
-            flex-grow: 1;
-            display: flex;
-            align-items: center;
-        }
-        .city-name {
-            font-size: 20px;
-            font-weight: 500;
-            color: var(--text-color-primary);
-        }
+        .city-header-main { flex-grow: 1; display: flex; align-items: center; }
+        .city-name { font-size: 20px; font-weight: 500; color: var(--text-color-primary); }
         .city-expand-icon-placeholder { 
-            width: 20px;
-            height: 20px;
-            color: var(--text-color-tertiary);
-            margin-left: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 20px; height: 20px; color: var(--text-color-tertiary);
+            margin-left: 12px; display: flex; align-items: center; justify-content: center;
         }
-        .city-actions {
-            display: flex;
-            align-items: center;
-        }
+        .city-actions { display: flex; align-items: center; }
         .city-ai-button { 
-            background-color: var(--highlight-color);
-            color: var(--text-color-primary); 
-            padding: 8px 12px; 
-            font-size: 13px;
-            margin-left: 12px;
-            font-weight: 500;
+            background-color: var(--highlight-color); color: var(--text-color-primary); 
+            padding: 8px 12px; font-size: 13px; margin-left: 12px; font-weight: 500;
         }
         .delete-city-button-placeholder { padding: 8px; }
 
-        .attractions-container {
-            padding: 0; 
-            background-color: var(--secondary-bg-color); 
-            display: none;
-        }
+        .attractions-container { padding: 0; background-color: var(--secondary-bg-color); display: none; }
         .attractions-container.expanded { display: block; }
-        .attraction-category { margin-top: 0; }
         .attraction-category-title {
-            font-size: 16px; 
-            font-weight: 600;
-            color: var(--text-color-secondary);
+            font-size: 16px; font-weight: 600; color: var(--text-color-secondary);
             background-color: var(--tertiary-bg-color); 
-            padding: 10px 15px;
-            margin: 0;
+            padding: 10px 15px; margin: 0;
             border-bottom: 1px solid var(--border-color);
         }
-        .attraction-item { 
-            padding-left: 15px; 
-            padding-right: 15px;
-        }
-        .attraction-details {
-            flex-grow: 1;
-            display: flex;
-            align-items: center;
-            cursor: pointer; 
-        }
+        .attraction-item { padding-left: 15px; padding-right: 15px; }
+        .attraction-details { flex-grow: 1; display: flex; align-items: center; cursor: pointer; }
         .attraction-price {
-            font-size: 0.9em;
-            color: var(--text-color-tertiary);
-            margin-left: 10px;
-            font-style: normal; 
-            white-space: nowrap;
+            font-size: 0.9em; color: var(--text-color-tertiary);
+            margin-left: 10px; font-style: normal; white-space: nowrap;
         }
-        .attraction-text.ai-suggestion {
-            font-style: italic;
-            color: var(--highlight-color); 
-        }
+        .attraction-text.ai-suggestion { font-style: italic; color: var(--highlight-color); }
         .attraction-text.ai-suggestion .attraction-price { color: var(--highlight-color); }
         .delete-attraction-button-placeholder { padding: 8px; }
 
-        /* Styles pour InfoScreen */
         .info-section {
-            margin-bottom: 20px;
-            padding: 15px;
+            margin-bottom: 20px; padding: 15px;
             background-color: var(--secondary-bg-color); 
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
+            border-radius: 10px; border: 1px solid var(--border-color);
         }
         .info-section-title {
-            font-size: 18px; 
-            font-weight: 600;
-            color: var(--text-color-primary);
-            margin-bottom: 12px;
+            font-size: 18px; font-weight: 600;
+            color: var(--text-color-primary); margin-bottom: 12px;
         }
-        .info-text, .info-list-item {
-            font-size: 16px;
-            color: var(--text-color-secondary);
-            line-height: 1.6;
-        }
-        .info-small-text {
-            font-size: 13px;
-            color: var(--text-color-tertiary);
-            margin-top: 8px;
-        }
-        .useful-words-list .info-list-item {
-            display: flex; 
-            align-items: center;
-            justify-content: space-between; 
-        }
+        .info-list-item { font-size: 16px; color: var(--text-color-secondary); line-height: 1.6; }
+        .info-small-text { font-size: 13px; color: var(--text-color-tertiary); margin-top: 8px; }
+        .useful-words-list .info-list-item { display: flex; align-items: center; justify-content: space-between; }
         .useful-words-list .info-list-item.ai-suggestion { color: var(--highlight-color); }
         .speaker-icon-placeholder { 
-            width: 18px;
-            height: 18px;
-            margin-left: 10px;
-            cursor: pointer;
-            color: var(--accent-color);
-            transition: opacity 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 18px; height: 18px; margin-left: 10px; cursor: pointer;
+            color: var(--accent-color); transition: opacity 0.2s ease;
+            display: flex; align-items: center; justify-content: center;
         }
         .speaker-icon-placeholder:hover { opacity: 0.7; }
 
-        .converter-container {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .converter-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .converter-row { display: flex; align-items: center; gap: 10px; }
+        .converter-container { display: flex; flex-direction: column; gap: 12px; }
         .converter-row input[type="number"] {
-            flex-grow: 1;
-            padding: 10px 12px; 
+            flex-grow: 1; padding: 10px 12px; 
             background-color: var(--tertiary-bg-color); 
-            color: var(--text-color-primary);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 16px;
+            color: var(--text-color-primary); border: 1px solid var(--border-color);
+            border-radius: 6px; font-size: 16px;
         }
-        .converter-row span {
-            font-size: 16px;
-            color: var(--text-color-secondary);
-        }
+        .converter-row span { font-size: 16px; color: var(--text-color-secondary); }
 
-        /* Message de chargement/erreur */
-        .message-toast {
-            position: fixed;
-            bottom: 80px; 
-            left: 50%;
+        .loading-message, .error-message {
+            position: fixed; bottom: 80px; left: 50%;
             transform: translateX(-50%);
             background-color: rgba(50, 50, 50, 0.85); 
-            backdrop-filter: blur(5px); 
-            color: white;
-            padding: 12px 22px;
-            border-radius: 20px; 
-            z-index: 1000;
-            display: none;
-            font-size: 14px;
+            backdrop-filter: blur(5px); color: white;
+            padding: 12px 22px; border-radius: 20px; 
+            z-index: 1000; display: none; font-size: 14px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
-        .message-toast.error { background-color: rgba(200, 50, 50, 0.85); }
-        .message-toast.success { background-color: rgba(50, 150, 50, 0.85); } /* Added success style */
-
-        #userIdDisplay {
-            text-align: center;
-            padding: 5px;
-            font-size: 10px;
-            color: var(--text-color-tertiary);
-            background-color: var(--bg-color);
-            border-bottom: 1px solid var(--border-color);
-            height: 10px; /* Reserve space */
-            line-height: 10px;
-            flex-shrink: 0;
-        }
+        .error-message { background-color: rgba(200, 50, 50, 0.85); }
 
     </style>
 </head>
 <body>
     <div class="status-bar-placeholder"></div>
-    <div id="userIdDisplay">UserID: non connecté</div>
 
     <div class="main-content">
-        <div id="toastMessage" class="message-toast">Message</div>
+        <div id="loadingMessage" class="loading-message">Chargement des suggestions IA...</div>
+        <div id="errorMessage" class="error-message">Une erreur est survenue.</div>
 
         <div id="checklistScreen" class="screen active">
             <h1 class="screen-title">Checklist Avant Départ</h1>
@@ -429,8 +254,7 @@
                 <span id="aiButtonSuggestTaskIconPlaceholder"></span>
                 Suggérer des tâches
             </button>
-            <div id="checklistItemsContainer" class="scroll-container checklist-scroll-container">
-                </div>
+            <div id="checklistItemsContainer" class="scroll-container checklist-scroll-container"></div>
         </div>
 
         <div id="citiesScreen" class="screen">
@@ -439,8 +263,7 @@
                 <input type="text" id="newCityInput" class="text-input" placeholder="Nom de la nouvelle ville...">
                 <button id="addCityButton" class="button add-button">Ajouter Ville</button>
             </div>
-            <div id="citiesListContainer" class="cities-scroll-container" style="padding:0; background-color: transparent;">
-                </div>
+            <div id="citiesListContainer" class="cities-scroll-container" style="padding:0; background-color: transparent;"></div>
         </div>
 
         <div id="infoScreen" class="screen">
@@ -462,8 +285,7 @@
                 </div>
                 <div class="info-section" id="usefulWordsSection">
                     <h2 class="info-section-title">Quelques Mots Utiles</h2>
-                    <div id="usefulWordsList" class="useful-words-list">
-                        </div>
+                    <div id="usefulWordsList" class="useful-words-list"></div>
                     <button id="suggestWordsButton" class="button ai-button" style="margin-top: 15px; font-size: 14px; padding: 10px 15px; width:100%;">
                         <span id="aiButtonSuggestWordIconPlaceholder"></span>
                         Plus de mots
@@ -501,41 +323,7 @@
         </button>
     </div>
 
-    <script type="module">
-        // Firebase Imports
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { 
-            getAuth, 
-            signInAnonymously, 
-            signInWithCustomToken, 
-            onAuthStateChanged,
-            setPersistence,
-            browserLocalPersistence 
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { 
-            getFirestore, 
-            doc, 
-            getDoc, 
-            setDoc, 
-            addDoc, 
-            updateDoc, 
-            deleteDoc, 
-            onSnapshot, 
-            collection, 
-            query, 
-            writeBatch,
-            getDocs,
-            Timestamp,
-            orderBy // Keep if needed, but be mindful of index requirements
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // --- Configuration Globale ---
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        
-        let db, auth, userId;
-        let unsubscribeChecklist = () => {}, unsubscribeCities = () => {}, unsubscribeUsefulWords = () => {};
-
+    <script>
         // --- Définitions des Icônes SVG ---
         const icons = {
             checklist: '<svg class="svg-icon large" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2ZM18 20H6V4H13V9H18V20ZM8 11H16V13H8V11ZM8 15H16V17H8V15Z"/></svg>',
@@ -550,12 +338,20 @@
             speaker: '<svg class="svg-icon small" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M3 9V15H7L12 20V4L7 9H3ZM16.5 12C16.5 10.23 15.48 8.71 14 7.97V16.02C15.48 15.29 16.5 13.77 16.5 12ZM14 3.23V5.29C16.89 6.15 19 8.83 19 12C19 15.17 16.89 17.84 14 18.7V20.77C18.01 19.86 21 16.28 21 12C21 7.72 18.01 4.14 14 3.23Z"/></svg>'
         };
 
+        const LOCAL_STORAGE_KEY = 'japanTripPlannerData';
         let currentExchangeRate = 160; 
         
-        // --- Données locales (seront synchronisées avec Firestore) ---
-        let checklistItems = [];
-        let citiesData = [];
-        let usefulWords = [];
+        // --- Données par défaut ---
+        let checklistItems = [ { id: '1', text: 'Réserver les vols', completed: false }, { id: '2', text: 'Réserver les hébergements', completed: false }];
+        let citiesData = [ 
+            { id: 'tokyo', name: 'Tokyo', isExpanded: false, attractions: [{ id:'t1', text: 'Traversée de Shibuya', category: 'Point d\'intérêt', price: 'Gratuit', completed: false },{ id:'t2', text: 'Tour de Tokyo', category: 'Monument', price: '¥¥', completed: false }] },
+            { id: 'kyoto', name: 'Kyoto', isExpanded: false, attractions: [{ id:'k1', text: 'Kinkaku-ji (Pavillon d\'Or)', category: 'Culturel', price: '¥', completed: false }] }
+        ];
+        let usefulWords = [ 
+            { text: "Bonjour", translation: "こんにちは", isAISuggestion: false, lang: "ja-JP" },
+            { text: "Merci", translation: "ありがとう", isAISuggestion: false, lang: "ja-JP" },
+            { text: "S'il vous plaît", translation: "おねがいします", isAISuggestion: false, lang: "ja-JP" }
+        ];
 
         const domElements = {
             screens: document.querySelectorAll('.screen'),
@@ -568,7 +364,8 @@
             citiesListContainer: document.getElementById('citiesListContainer'),
             newCityInput: document.getElementById('newCityInput'),
             addCityButton: document.getElementById('addCityButton'),
-            toastMessage: document.getElementById('toastMessage'), // Updated from loading/error to generic toast
+            loadingMessage: document.getElementById('loadingMessage'),
+            errorMessage: document.getElementById('errorMessage'),
             eurInput: document.getElementById('eurInput'),
             jpyInput: document.getElementById('jpyInput'),
             conversionRateText: document.getElementById('conversionRateText'),
@@ -578,66 +375,77 @@
             tabIconChecklist: document.getElementById('tabIconChecklist'),
             tabIconCities: document.getElementById('tabIconCities'),
             tabIconInfo: document.getElementById('tabIconInfo'),
-            userIdDisplay: document.getElementById('userIdDisplay'),
         };
-        
-        // --- Fonctions Toast (remplace loading/error) ---
-        function showToast(message, type = 'info', duration = 3000) { // types: info, success, error
-            domElements.toastMessage.textContent = message;
-            domElements.toastMessage.className = 'message-toast'; // Reset classes
-            if (type === 'error') domElements.toastMessage.classList.add('error');
-            if (type === 'success') domElements.toastMessage.classList.add('success');
-            // For 'info', no extra class, uses default styling.
-            
-            domElements.toastMessage.style.display = 'block';
-            setTimeout(() => {
-                domElements.toastMessage.style.display = 'none';
-            }, duration);
+
+        // --- Sauvegarde et Chargement des données ---
+        function saveData() {
+            try {
+                const dataToSave = {
+                    checklist: checklistItems,
+                    cities: citiesData,
+                    words: usefulWords
+                };
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(dataToSave));
+            } catch (error) {
+                console.error("Erreur lors de la sauvegarde des données:", error);
+                showErrorMessage("Impossible de sauvegarder les données.");
+            }
         }
 
+        function loadData() {
+            const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+            if (savedData) {
+                try {
+                    const parsedData = JSON.parse(savedData);
+                    // Vérifier que les données parsées ont bien les clés attendues
+                    if (parsedData.checklist) checklistItems = parsedData.checklist;
+                    if (parsedData.cities) citiesData = parsedData.cities;
+                    if (parsedData.words) usefulWords = parsedData.words;
+                } catch (error) {
+                    console.error("Erreur lors du chargement des données sauvegardées:", error);
+                    localStorage.removeItem(LOCAL_STORAGE_KEY); // Supprimer les données corrompues
+                }
+            }
+        }
+        
+        function showLoadingMessage(message = "Chargement...") {
+            domElements.loadingMessage.textContent = message;
+            domElements.loadingMessage.style.display = 'block';
+            domElements.errorMessage.style.display = 'none';
+        }
+        function hideLoadingMessage() { domElements.loadingMessage.style.display = 'none'; }
+        function showErrorMessage(message = "Une erreur est survenue.") {
+            domElements.errorMessage.textContent = message;
+            domElements.errorMessage.style.display = 'block';
+            hideLoadingMessage();
+            setTimeout(() => { domElements.errorMessage.style.display = 'none'; }, 5000);
+        }
 
-        // --- Fonctions Gemini API ---
         async function generateContentWithGemini(prompt) {
-            showToast("L'IA réfléchit...", 'info', 5000); // Longer duration for AI thinking
-            const apiKey = ""; // API Key will be injected by Canvas
+            showLoadingMessage("L'IA réfléchit...");
+            const apiKey = ""; // La clé sera injectée par l'environnement d'exécution
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
             const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
             try {
                 const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                if (!response.ok) { 
-                    const errorData = await response.json(); 
-                    throw new Error(errorData?.error?.message || "Erreur API Gemini."); 
-                }
+                if (!response.ok) { const errorData = await response.json(); throw new Error(errorData?.error?.message || "Erreur API Gemini."); }
                 const result = await response.json();
-                if (result.candidates?.[0]?.content?.parts?.[0]?.text) { 
-                    showToast("Suggestions reçues!", 'success');
-                    return result.candidates[0].content.parts[0].text; 
-                }
+                hideLoadingMessage();
+                if (result.candidates?.[0]?.content?.parts?.[0]?.text) { return result.candidates[0].content.parts[0].text; }
                 throw new Error("Réponse IA inattendue.");
-            } catch (error) { 
-                console.error("Erreur API Gemini:", error); 
-                showToast(error.message, 'error'); 
-                throw error; 
-            }
+            } catch (error) { console.error("Erreur API Gemini:", error); showErrorMessage(error.message); hideLoadingMessage(); throw error; }
         }
 
-        // --- Navigation ---
         function setActiveScreen(screenId) {
             domElements.screens.forEach(screen => screen.classList.toggle('active', screen.id === screenId));
             domElements.tabItems.forEach(tab => tab.classList.toggle('active', tab.dataset.screen === screenId));
         }
         domElements.tabItems.forEach(tab => tab.addEventListener('click', () => setActiveScreen(tab.dataset.screen)));
 
-        // --- Checklist Fonctions ---
         function renderChecklistItems() {
-            if (!domElements.checklistItemsContainer) return;
             domElements.checklistItemsContainer.innerHTML = '';
-            // Sort by timestamp, oldest first. Add .orderBy('createdAt', 'asc') to Firestore query for this.
-            // For now, client-side sort if not done by query:
-            const sortedItems = [...checklistItems].sort((a, b) => (a.createdAt?.toMillis() || 0) - (b.createdAt?.toMillis() || 0));
-
-            sortedItems.forEach(item => {
-                const div = document.createElement('div'); div.className = 'list-item checklist-item'; div.dataset.id = item.id;
+            checklistItems.forEach(item => {
+                const div = document.createElement('div'); div.className = 'list-item checklist-item';
                 const contentDiv = document.createElement('div'); contentDiv.className = 'checklist-item-content';
                 const checkboxPlaceholder = document.createElement('span'); checkboxPlaceholder.className = 'checkbox-placeholder';
                 checkboxPlaceholder.innerHTML = item.completed ? icons.checkboxChecked : icons.checkboxEmpty;
@@ -653,95 +461,47 @@
                 domElements.checklistItemsContainer.appendChild(div);
             });
         }
-
-        async function toggleChecklistItem(id) { 
-            if (!userId) { showToast("Non connecté.", "error"); return; }
-            const item = checklistItems.find(i => i.id === id); 
-            if (item) { 
-                try {
-                    const itemRef = doc(db, `artifacts/${appId}/users/${userId}/checklistItems`, id);
-                    await updateDoc(itemRef, { completed: !item.completed });
-                    // No need to call renderChecklistItems() here, onSnapshot will do it.
-                    showToast("Tâche mise à jour.", "success");
-                } catch (e) {
-                    console.error("Error toggling item: ", e);
-                    showToast("Erreur mise à jour tâche.", "error");
-                }
-            }
-        }
-
-        async function addChecklistItem() {
-            if (!userId) { showToast("Non connecté.", "error"); return; }
+        function toggleChecklistItem(id) { const item = checklistItems.find(i => i.id === id); if (item) { item.completed = !item.completed; renderChecklistItems(); saveData(); }}
+        function deleteChecklistItem(id) { checklistItems = checklistItems.filter(i => i.id !== id); renderChecklistItems(); saveData(); }
+        function addChecklistItem() {
             const text = domElements.newItemInput.value.trim(); if (text === '') return;
-            try {
-                await addDoc(collection(db, `artifacts/${appId}/users/${userId}/checklistItems`), { 
-                    text: text, 
-                    completed: false,
-                    createdAt: Timestamp.now() 
-                });
-                domElements.newItemInput.value = ''; 
-                // No need to call renderChecklistItems() here, onSnapshot will do it.
-                showToast("Tâche ajoutée.", "success");
-            } catch (e) {
-                console.error("Error adding item: ", e);
-                showToast("Erreur ajout tâche.", "error");
-            }
+            checklistItems.push({ id: Date.now().toString(), text: text, completed: false });
+            domElements.newItemInput.value = ''; renderChecklistItems(); saveData();
         }
-        if(domElements.addItemButton) domElements.addItemButton.addEventListener('click', addChecklistItem);
-        if(domElements.newItemInput) domElements.newItemInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') addChecklistItem(); });
-
-        async function deleteChecklistItem(id) { 
-            if (!userId) { showToast("Non connecté.", "error"); return; }
-            try {
-                await deleteDoc(doc(db, `artifacts/${appId}/users/${userId}/checklistItems`, id));
-                // No need to call renderChecklistItems() here, onSnapshot will do it.
-                showToast("Tâche supprimée.", "success");
-            } catch (e) {
-                console.error("Error deleting item: ", e);
-                showToast("Erreur suppression tâche.", "error");
-            }
-        }
-
+        domElements.addItemButton.addEventListener('click', addChecklistItem);
+        domElements.newItemInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') addChecklistItem(); });
+        
         async function suggestNewTasks() {
-            if (!userId) { showToast("Non connecté.", "error"); return; }
             const existingTasksText = checklistItems.map(item => `- ${item.text}`).join('\n');
-            const prompt = `Je planifie un voyage au Japon. Ma checklist actuelle:\n${existingTasksText}\n\nSuggère 3 tâches de préparation importantes et concises pour un voyage au Japon. Ne répète pas les tâches existantes. Une tâche par ligne, sans tiret ni numérotation.`;
+            const prompt = `Je planifie un voyage au Japon. Ma checklist actuelle:\n${existingTasksText}\n\nSuggère 3 tâches de préparation importantes et concises. Ne répète pas. Une tâche par ligne, sans tiret.`;
             try {
                 const suggestionsText = await generateContentWithGemini(prompt);
-                const batch = writeBatch(db);
                 suggestionsText.split('\n').filter(task => task.trim() !== '').forEach(taskText => {
                     if (!checklistItems.some(item => item.text.toLowerCase() === taskText.toLowerCase().trim())) {
-                        const newTaskRef = doc(collection(db, `artifacts/${appId}/users/${userId}/checklistItems`));
-                        batch.set(newTaskRef, { text: taskText.trim(), completed: false, createdAt: Timestamp.now(), isAISuggestion: true });
+                        checklistItems.push({ id: Date.now().toString() + Math.random(), text: taskText.trim(), completed: false, isAISuggestion: true });
                     }
                 });
-                await batch.commit();
-                // onSnapshot will update the UI.
-            } catch (error) { console.error("Erreur suggestion tâches:", error); /* Gemini error already shown by showToast */ }
+                renderChecklistItems(); saveData();
+            } catch (error) { console.error("Erreur suggestion tâches:", error); }
         }
-        if(domElements.suggestTasksButton) domElements.suggestTasksButton.addEventListener('click', suggestNewTasks);
+        domElements.suggestTasksButton.addEventListener('click', suggestNewTasks);
 
-        // --- Villes et Attractions Fonctions ---
         function renderCities() {
-            if (!domElements.citiesListContainer) return;
             domElements.citiesListContainer.innerHTML = '';
-             const sortedCities = [...citiesData].sort((a, b) => (a.createdAt?.toMillis() || 0) - (b.createdAt?.toMillis() || 0));
-
-            sortedCities.forEach(city => {
-                const cityCard = document.createElement('div'); cityCard.className = 'city-container'; cityCard.dataset.id = city.id;
+            citiesData.forEach(city => {
+                const cityCard = document.createElement('div'); cityCard.className = 'city-container';
                 const header = document.createElement('div'); header.className = 'city-header';
                 const headerMain = document.createElement('div'); headerMain.className = 'city-header-main';
                 headerMain.innerHTML = `<span class="city-name">${city.name}</span>`;
                 const expandIconPlaceholder = document.createElement('span'); expandIconPlaceholder.className = 'city-expand-icon-placeholder';
                 expandIconPlaceholder.innerHTML = city.isExpanded ? icons.minus : icons.plus;
                 headerMain.appendChild(expandIconPlaceholder);
-                headerMain.addEventListener('click', () => toggleCityExpansion(city.id));
+                headerMain.addEventListener('click', () => { city.isExpanded = !city.isExpanded; renderCities(); saveData(); });
                 
                 const cityActionsDiv = document.createElement('div'); cityActionsDiv.className = 'city-actions';
                 const aiButton = document.createElement('button'); aiButton.className = 'button city-ai-button';
                 aiButton.innerHTML = icons.sparkle + ' Idées';
-                aiButton.addEventListener('click', async (e) => { e.stopPropagation(); await suggestCityAttractions(city.id); });
-                
+                aiButton.addEventListener('click', (e) => { e.stopPropagation(); suggestCityAttractions(city.id); });
                 const deleteCityBtnPlaceholder = document.createElement('span'); deleteCityBtnPlaceholder.className = 'delete-button-placeholder delete-city-button-placeholder';
                 deleteCityBtnPlaceholder.innerHTML = icons.trash;
                 deleteCityBtnPlaceholder.addEventListener('click', (e) => { e.stopPropagation(); deleteCity(city.id); });
@@ -757,14 +517,12 @@
                         if (!acc[category]) acc[category] = []; acc[category].push(attraction); return acc;
                     }, {});
 
-                    // Sort categories alphabetically, then attractions within categories
-                    Object.keys(attractionsByCategory).sort().forEach(category => {
+                    for (const category in attractionsByCategory) {
                         const categoryDiv = document.createElement('div'); categoryDiv.className = 'attraction-category';
                         const categoryTitle = document.createElement('h3'); categoryTitle.className = 'attraction-category-title'; categoryTitle.textContent = category;
                         categoryDiv.appendChild(categoryTitle);
-
-                        attractionsByCategory[category].sort((a,b) => a.text.localeCompare(b.text)).forEach(attraction => {
-                            const itemDiv = document.createElement('div'); itemDiv.className = 'list-item attraction-item'; itemDiv.dataset.id = attraction.id;
+                        attractionsByCategory[category].forEach(attraction => {
+                            const itemDiv = document.createElement('div'); itemDiv.className = 'list-item attraction-item';
                             const checkboxPlaceholder = document.createElement('span'); checkboxPlaceholder.className = 'attraction-checkbox-placeholder';
                             checkboxPlaceholder.innerHTML = attraction.completed ? icons.checkboxChecked : icons.checkboxEmpty;
                             
@@ -783,155 +541,57 @@
                             }
                             itemDiv.appendChild(checkboxPlaceholder); itemDiv.appendChild(detailsDiv);
                             
-                            const deleteAttractionBtnPlaceholder = document.createElement('span'); deleteAttractionBtnPlaceholder.className = 'delete-button-placeholder delete-attraction-button-placeholder';
-                            deleteAttractionBtnPlaceholder.innerHTML = icons.trash;
-                            deleteAttractionBtnPlaceholder.addEventListener('click', (e) => { e.stopPropagation(); deleteCityAttraction(city.id, attraction.id); });
-                            itemDiv.appendChild(deleteAttractionBtnPlaceholder);
+                            const deleteAttractionBtn = document.createElement('span'); deleteAttractionBtn.className = 'delete-button-placeholder delete-attraction-button-placeholder';
+                            deleteAttractionBtn.innerHTML = icons.trash;
+                            deleteAttractionBtn.addEventListener('click', (e) => { e.stopPropagation(); deleteCityAttraction(city.id, attraction.id); });
+                            itemDiv.appendChild(deleteAttractionBtn);
                             categoryDiv.appendChild(itemDiv);
                         });
                         attractionsContainer.appendChild(categoryDiv);
-                    });
+                    }
                 }
                 cityCard.appendChild(header); cityCard.appendChild(attractionsContainer);
                 domElements.citiesListContainer.appendChild(cityCard);
             });
         }
-        
-        async function toggleCityExpansion(cityId) {
-            if (!userId) { showToast("Non connecté.", "error"); return; }
-            const city = citiesData.find(c => c.id === cityId);
-            if (city) {
-                try {
-                    const cityRef = doc(db, `artifacts/${appId}/users/${userId}/cities`, cityId);
-                    await updateDoc(cityRef, { isExpanded: !city.isExpanded });
-                    // onSnapshot will re-render
-                } catch (e) {
-                    console.error("Error toggling city expansion: ", e);
-                    showToast("Erreur expansion ville.", "error");
-                }
-            }
-        }
 
-        async function addCity() {
-            if (!userId) { showToast("Non connecté.", "error"); return; }
+        function addCity() {
             const cityName = domElements.newCityInput.value.trim();
-            if (cityName === '') { showToast("Le nom de la ville est requis.", "error"); return; }
-            if (citiesData.some(city => city.name.toLowerCase() === cityName.toLowerCase())) { showToast("Cette ville existe déjà.", "error"); return; }
-            
-            try {
-                await addDoc(collection(db, `artifacts/${appId}/users/${userId}/cities`), { 
-                    name: cityName, 
-                    isExpanded: false, 
-                    attractions: [],
-                    createdAt: Timestamp.now()
-                });
-                domElements.newCityInput.value = ''; 
-                showToast("Ville ajoutée.", "success");
-            } catch (e) {
-                console.error("Error adding city: ", e);
-                showToast("Erreur ajout ville.", "error");
-            }
+            if (cityName === '') { showErrorMessage("Le nom de la ville est requis."); return; }
+            if (citiesData.some(city => city.name.toLowerCase() === cityName.toLowerCase())) { showErrorMessage("Cette ville existe déjà."); return; }
+            citiesData.push({ id: cityName.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now(), name: cityName, isExpanded: false, attractions: [] });
+            domElements.newCityInput.value = ''; renderCities(); saveData();
         }
-        if(domElements.addCityButton) domElements.addCityButton.addEventListener('click', addCity);
-        if(domElements.newCityInput) domElements.newCityInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') addCity(); });
-
-        async function deleteCity(cityId) { 
-            if (!userId) { showToast("Non connecté.", "error"); return; }
-            // Note: Subcollections (if attractions were one) are not automatically deleted.
-            // Since attractions are an array in the city doc, deleting the city doc is enough.
-            try {
-                await deleteDoc(doc(db, `artifacts/${appId}/users/${userId}/cities`, cityId));
-                showToast("Ville supprimée.", "success");
-            } catch (e) {
-                console.error("Error deleting city: ", e);
-                showToast("Erreur suppression ville.", "error");
-            }
-        }
-
-        async function toggleCityAttractionCompleted(cityId, attractionId) {
-            if (!userId) { showToast("Non connecté.", "error"); return; }
+        domElements.addCityButton.addEventListener('click', addCity);
+        domElements.newCityInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') addCity(); });
+        function deleteCity(cityId) { citiesData = citiesData.filter(city => city.id !== cityId); renderCities(); saveData(); }
+        function toggleCityAttractionCompleted(cityId, attractionId) {
             const city = citiesData.find(c => c.id === cityId);
-            if (city) { 
-                const attraction = city.attractions.find(a => a.id === attractionId); 
-                if (attraction) {
-                    const updatedAttractions = city.attractions.map(attr => 
-                        attr.id === attractionId ? { ...attr, completed: !attr.completed } : attr
-                    );
-                    try {
-                        const cityRef = doc(db, `artifacts/${appId}/users/${userId}/cities`, cityId);
-                        await updateDoc(cityRef, { attractions: updatedAttractions });
-                        showToast("Attraction mise à jour.", "success");
-                    } catch (e) {
-                        console.error("Error toggling attraction: ", e);
-                        showToast("Erreur mise à jour attraction.", "error");
-                    }
-                }
-            }
+            if (city) { const attraction = city.attractions.find(a => a.id === attractionId); if (attraction) { attraction.completed = !attraction.completed; renderCities(); saveData(); }}
         }
-
-        async function deleteCityAttraction(cityId, attractionId) {
-            if (!userId) { showToast("Non connecté.", "error"); return; }
+        function deleteCityAttraction(cityId, attractionId) {
             const city = citiesData.find(c => c.id === cityId);
-            if (city) { 
-                const updatedAttractions = city.attractions.filter(a => a.id !== attractionId);
-                try {
-                    const cityRef = doc(db, `artifacts/${appId}/users/${userId}/cities`, cityId);
-                    await updateDoc(cityRef, { attractions: updatedAttractions });
-                    showToast("Attraction supprimée.", "success");
-                } catch (e) {
-                    console.error("Error deleting attraction: ", e);
-                    showToast("Erreur suppression attraction.", "error");
-                }
-            }
+            if (city) { city.attractions = city.attractions.filter(a => a.id !== attractionId); renderCities(); saveData(); }
         }
-
         async function suggestCityAttractions(cityId) {
-            if (!userId) { showToast("Non connecté.", "error"); return; }
             const city = citiesData.find(c => c.id === cityId); if (!city) return;
-            
             const existingAttractionsText = (city.attractions || []).map(attr => `- ${attr.text}`).join('\n');
-            const prompt = `Pour la ville de ${city.name} au Japon, suggère 2-3 activités ou lieux touristiques intéressants, en plus de ceux-ci (s'il y en a):\n${existingAttractionsText}\n\nPour chaque suggestion, donne le nom, une catégorie (ex: Culturel, Nature, Nourriture, Shopping, Point d'intérêt, Monument), et une estimation de prix (Gratuit, ¥, ¥¥, ¥¥¥, ou N/A si non applicable).
-Ne répète pas les attractions existantes.
-Format exact pour chaque suggestion (une par ligne): NOM_ATTRACTION;CATEGORIE;PRIX
-Exemple: Temple Senso-ji;Culturel;Gratuit`;
-            
+            const prompt = `Pour ${city.name}, Japon, suggère 2-3 activités/lieux en plus de:\n${existingAttractionsText}\n\nFormat: NOM;CATEGORIE;PRIX (Gratuit,¥,¥¥,¥¥¥,N/A). Concis. Ex: Temple Zuisen-ji;Culturel;¥`;
             try {
                 const suggestionsText = await generateContentWithGemini(prompt);
-                let newAttractions = [...(city.attractions || [])];
-                let changed = false;
-
-                suggestionsText.split('\n').filter(attr => attr.trim() !== '').forEach(rawAttrText => {
+                suggestionsText.split('\n').filter(attr => attr.trim() !== '' && attr.includes(';')).forEach(rawAttrText => {
                     const parts = rawAttrText.split(';');
-                    if (parts.length >= 3) {
-                        const text = parts[0]?.trim();
-                        const category = parts[1]?.trim() || "Suggestion";
-                        const price = parts[2]?.trim() || "N/A";
-                        if (text && !newAttractions.some(ea => ea.text.toLowerCase().includes(text.toLowerCase()))) {
-                            newAttractions.push({ 
-                                id: city.id + '_ai_' + Date.now() + Math.random().toString(36).substr(2, 5), 
-                                text, 
-                                category, 
-                                price, 
-                                completed: false, 
-                                isAISuggestion: true 
-                            });
-                            changed = true;
-                        }
+                    const text = parts[0]?.trim() || "Suggestion IA";
+                    const category = parts[1]?.trim() || "Suggestion";
+                    const price = parts[2]?.trim() || "N/A";
+                    if (!city.attractions.some(ea => ea.text.toLowerCase().includes(text.toLowerCase()))) {
+                        city.attractions.push({ id: city.id + '_ai_' + Date.now() + Math.random(), text, category, price, completed: false, isAISuggestion: true });
                     }
                 });
-
-                if (changed) {
-                    const cityRef = doc(db, `artifacts/${appId}/users/${userId}/cities`, cityId);
-                    await updateDoc(cityRef, { attractions: newAttractions, isExpanded: true });
-                    // onSnapshot will update UI
-                } else if (!city.isExpanded) { // Expand even if no new suggestions, to show existing ones
-                     const cityRef = doc(db, `artifacts/${appId}/users/${userId}/cities`, cityId);
-                    await updateDoc(cityRef, { isExpanded: true });
-                }
+                if (!city.isExpanded) city.isExpanded = true; renderCities(); saveData();
             } catch (error) { console.error(`Erreur suggestion pour ${city.name}:`, error); }
         }
-
-        // --- Info Screen Fonctions ---
+        
         function updateConversionRateText() { if(domElements.conversionRateText) domElements.conversionRateText.textContent = `Taux : 1 EUR ≈ ${currentExchangeRate} JPY`; }
         function convertCurrency() {
             const eurValue = parseFloat(domElements.eurInput.value);
@@ -939,8 +599,8 @@ Exemple: Temple Senso-ji;Culturel;Gratuit`;
             if (document.activeElement === domElements.eurInput && !isNaN(eurValue)) domElements.jpyInput.value = (eurValue * currentExchangeRate).toFixed(0);
             else if (document.activeElement === domElements.jpyInput && !isNaN(jpyValue)) domElements.eurInput.value = (jpyValue / currentExchangeRate).toFixed(2);
         }
-        if(domElements.eurInput) domElements.eurInput.addEventListener('input', convertCurrency);
-        if(domElements.jpyInput) domElements.jpyInput.addEventListener('input', convertCurrency);
+        domElements.eurInput.addEventListener('input', convertCurrency);
+        domElements.jpyInput.addEventListener('input', convertCurrency);
 
         function speak(text, lang = 'ja-JP') {
             if ('speechSynthesis' in window) {
@@ -948,15 +608,12 @@ Exemple: Temple Senso-ji;Culturel;Gratuit`;
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = lang; utterance.rate = 0.9; 
                 window.speechSynthesis.speak(utterance);
-            } else { showToast("La synthèse vocale n'est pas supportée.", "error"); }
+            } else { showErrorMessage("La synthèse vocale n'est pas supportée."); }
         }
-
         function renderUsefulWords() {
             if (!domElements.usefulWordsListDiv) return;
             domElements.usefulWordsListDiv.innerHTML = ''; 
-            const sortedWords = [...usefulWords].sort((a, b) => (a.createdAt?.toMillis() || 0) - (b.createdAt?.toMillis() || 0));
-            
-            sortedWords.forEach(word => {
+            usefulWords.forEach(word => {
                 const p = document.createElement('p'); p.className = 'info-list-item';
                 if (word.isAISuggestion) p.classList.add('ai-suggestion');
                 const textSpan = document.createElement('span'); textSpan.textContent = `• ${word.text}: ${word.translation}`;
@@ -968,37 +625,31 @@ Exemple: Temple Senso-ji;Culturel;Gratuit`;
                 domElements.usefulWordsListDiv.appendChild(p);
             });
         }
-
         async function suggestNewWords() {
-            if (!userId) { showToast("Non connecté.", "error"); return; }
             const existingWordsText = usefulWords.map(word => `- ${word.text}: ${word.translation}`).join('\n');
-            const prompt = `Je planifie un voyage au Japon. Voici des mots/phrases que je connais déjà :\n${existingWordsText}\n\nSuggère 3-5 autres mots ou courtes phrases japonaises utiles pour un touriste. Pour chaque suggestion:
+            const prompt = `Je planifie un voyage au Japon. Mots/phrases utiles actuels:\n${existingWordsText}\n\nSuggère 3-5 autres mots ou courtes phrases japonaises utiles pour un touriste. Pour chaque suggestion:
 1. Le terme en français.
-2. Sa traduction STRICTEMENT en caractères japonais (Hiragana, Katakana, Kanji uniquement - pas de romaji, pas de notes explicatives dans la traduction).
-Sépare le français et le japonais par un DEUX-POINTS. Ne répète pas les mots existants.
-Format exact: TERME_FRANCAIS: TRADUCTION_JAPONAISE_PURE
-Exemple: Où sont les toilettes ?: トイレはどこですか`;
-            
+2. Sa traduction STRICTEMENT en caractères japonais (Hiragana, Katakana, Kanji uniquement - pas de romaji, pas de notes).
+Sépare le français et le japonais par un DEUX-POINTS.
+Format: TERME_FRANCAIS: TRADUCTION_JAPONAISE_PURE
+Exemple: Combien ça coûte ?: いくらですか`;
             try {
                 const suggestionsText = await generateContentWithGemini(prompt);
-                const batch = writeBatch(db);
                 suggestionsText.split('\n').filter(line => line.trim() !== '' && line.includes(':')).forEach(rawLine => {
                     const parts = rawLine.split(':');
                     if (parts.length >= 2) {
                         const textFr = parts[0].trim();
                         const translationJp = parts.slice(1).join(':').trim();
-                        if (textFr && translationJp && !usefulWords.some(w => w.text.toLowerCase() === textFr.toLowerCase() || w.translation.toLowerCase() === translationJp.toLowerCase())) {
-                             const newWordRef = doc(collection(db, `artifacts/${appId}/users/${userId}/usefulWords`));
-                             batch.set(newWordRef, { text: textFr, translation: translationJp, isAISuggestion: true, lang: 'ja-JP', createdAt: Timestamp.now() });
+                        if (!usefulWords.some(w => w.text.toLowerCase() === textFr.toLowerCase() || w.translation.toLowerCase() === translationJp.toLowerCase())) {
+                            usefulWords.push({ text: textFr, translation: translationJp, isAISuggestion: true, lang: 'ja-JP' });
                         }
                     }
                 });
-                await batch.commit();
+                renderUsefulWords(); saveData();
             } catch (error) { console.error("Erreur suggestion mots:", error); }
         }
-        if(domElements.suggestWordsButton) domElements.suggestWordsButton.addEventListener('click', suggestNewWords);
+        domElements.suggestWordsButton.addEventListener('click', suggestNewWords);
 
-        // --- Initialisation des Icônes ---
         function initIcons() {
             if(domElements.tabIconChecklist) domElements.tabIconChecklist.innerHTML = icons.checklist;
             if(domElements.tabIconCities) domElements.tabIconCities.innerHTML = icons.cities;
@@ -1006,183 +657,15 @@ Exemple: Où sont les toilettes ?: トイレはどこですか`;
             if(domElements.aiButtonSuggestTaskIconPlaceholder) domElements.aiButtonSuggestTaskIconPlaceholder.innerHTML = icons.sparkle;
             if(domElements.aiButtonSuggestWordIconPlaceholder) domElements.aiButtonSuggestWordIconPlaceholder.innerHTML = icons.sparkle;
         }
-        
-        // --- Initialisation des données par défaut pour un nouvel utilisateur ---
-        async function initializeDefaultDataIfNeeded(currentUserId) {
-            const checklistPath = `artifacts/${appId}/users/${currentUserId}/checklistItems`;
-            const citiesPath = `artifacts/${appId}/users/${currentUserId}/cities`;
-            const wordsPath = `artifacts/${appId}/users/${currentUserId}/usefulWords`;
-
-            const checklistQuery = query(collection(db, checklistPath));
-            const citiesQuery = query(collection(db, citiesPath));
-            const wordsQuery = query(collection(db, wordsPath));
-
-            const [checklistSnapshot, citiesSnapshot, wordsSnapshot] = await Promise.all([
-                getDocs(checklistQuery),
-                getDocs(citiesQuery),
-                getDocs(wordsQuery)
-            ]);
-
-            const batch = writeBatch(db);
-            let operationsCount = 0;
-
-            if (checklistSnapshot.empty) {
-                const defaultChecklist = [ { text: 'Réserver les vols', completed: false }, { text: 'Réserver les hébergements', completed: false }];
-                defaultChecklist.forEach(item => {
-                    const docRef = doc(collection(db, checklistPath));
-                    batch.set(docRef, {...item, createdAt: Timestamp.now()});
-                    operationsCount++;
-                });
-            }
-
-            if (citiesSnapshot.empty) {
-                const defaultCities = [ 
-                    { name: 'Tokyo', isExpanded: false, attractions: [{ id:'t1-' + Date.now(), text: 'Traversée de Shibuya', category: 'Point d\'intérêt', price: 'Gratuit', completed: false },{ id:'t2-' + Date.now(), text: 'Tour de Tokyo', category: 'Monument', price: '¥¥', completed: false }] },
-                    { name: 'Kyoto', isExpanded: false, attractions: [{ id:'k1-' + Date.now(), text: 'Kinkaku-ji (Pavillon d\'Or)', category: 'Culturel', price: '¥', completed: false }] }
-                ];
-                defaultCities.forEach(city => {
-                    const docRef = doc(collection(db, citiesPath));
-                    batch.set(docRef, {...city, createdAt: Timestamp.now()});
-                    operationsCount++;
-                });
-            }
-
-            if (wordsSnapshot.empty) {
-                const defaultWords = [ 
-                    { text: "Bonjour", translation: "こんにちは", isAISuggestion: false, lang: "ja-JP" },
-                    { text: "Merci", translation: "ありがとう", isAISuggestion: false, lang: "ja-JP" },
-                    { text: "S'il vous plaît", translation: "おねがいします", isAISuggestion: false, lang: "ja-JP" }
-                ];
-                defaultWords.forEach(word => {
-                    const docRef = doc(collection(db, wordsPath));
-                    batch.set(docRef, {...word, createdAt: Timestamp.now()});
-                    operationsCount++;
-                });
-            }
-
-            if (operationsCount > 0) {
-                try {
-                    await batch.commit();
-                    showToast("Données initiales configurées.", "success");
-                } catch (e) {
-                    console.error("Erreur initialisation données par défaut:", e);
-                    showToast("Erreur config. données.", "error");
-                }
-            }
-        }
-
-
-        // --- Initialisation Firebase et chargement des données ---
-        async function initializeAppAndData() {
-            if (!firebaseConfig) {
-                showToast("Configuration Firebase manquante.", "error");
-                console.error("Firebase config is missing.");
-                domElements.userIdDisplay.textContent = "Erreur de configuration Firebase";
-                return;
-            }
-
-            try {
-                const app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-                
-                // Optional: Enable offline persistence (local cache)
-                // try {
-                //    await setPersistence(auth, browserLocalPersistence);
-                //    console.log("Auth persistence set to local.");
-                // } catch (error) {
-                //    console.warn("Could not set auth persistence:", error.code, error.message);
-                // }
-
-
-                onAuthStateChanged(auth, async (user) => {
-                    // Unsubscribe from previous listeners if any
-                    unsubscribeChecklist();
-                    unsubscribeCities();
-                    unsubscribeUsefulWords();
-
-                    if (user) {
-                        userId = user.uid;
-                        domElements.userIdDisplay.textContent = `UserID: ${userId}`;
-                        showToast(`Connecté: ${userId.substring(0,8)}...`, "success", 1500);
-
-                        // Initialize default data for new users
-                        await initializeDefaultDataIfNeeded(userId);
-
-                        // Setup Firestore listeners
-                        const checklistQuery = query(collection(db, `artifacts/${appId}/users/${userId}/checklistItems`), orderBy("createdAt", "asc"));
-                        unsubscribeChecklist = onSnapshot(checklistQuery, (snapshot) => {
-                            checklistItems = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                            renderChecklistItems();
-                        }, (error) => {
-                            console.error("Error checklist snapshot: ", error);
-                            showToast("Erreur chargement checklist.", "error");
-                        });
-
-                        const citiesQuery = query(collection(db, `artifacts/${appId}/users/${userId}/cities`), orderBy("createdAt", "asc"));
-                        unsubscribeCities = onSnapshot(citiesQuery, (snapshot) => {
-                            citiesData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                            renderCities();
-                        }, (error) => {
-                            console.error("Error cities snapshot: ", error);
-                            showToast("Erreur chargement villes.", "error");
-                        });
-                        
-                        const usefulWordsQuery = query(collection(db, `artifacts/${appId}/users/${userId}/usefulWords`), orderBy("createdAt", "asc"));
-                        unsubscribeUsefulWords = onSnapshot(usefulWordsQuery, (snapshot) => {
-                            usefulWords = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                            renderUsefulWords();
-                        }, (error) => {
-                            console.error("Error useful words snapshot: ", error);
-                            showToast("Erreur chargement mots.", "error");
-                        });
-
-                    } else {
-                        userId = null;
-                        checklistItems = []; citiesData = []; usefulWords = [];
-                        renderChecklistItems(); renderCities(); renderUsefulWords();
-                        domElements.userIdDisplay.textContent = "UserID: non connecté";
-                        showToast("Déconnecté. Tentative de connexion...", "info");
-                        // Attempt to sign in again if disconnected
-                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                            await signInWithCustomToken(auth, __initial_auth_token);
-                        } else {
-                            await signInAnonymously(auth);
-                        }
-                    }
-                });
-
-                // Initial sign-in
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    try {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                    } catch (error) {
-                        console.error("Error signing in with custom token, trying anonymous:", error);
-                        await signInAnonymously(auth);
-                    }
-                } else {
-                    await signInAnonymously(auth);
-                }
-
-            } catch (e) {
-                console.error("Erreur initialisation Firebase:", e);
-                showToast("Erreur critique Firebase.", "error");
-                domElements.userIdDisplay.textContent = "Erreur Firebase";
-            }
-        }
-
 
         document.addEventListener('DOMContentLoaded', () => {
+            loadData(); // Charger les données sauvegardées en premier
             initIcons(); 
-            setActiveScreen('checklistScreen'); // Default screen
-            updateConversionRateText(); // Static for now
-            
-            initializeAppAndData().then(() => {
-                 // Initial renders are now handled by onSnapshot after auth
-                console.log("App initialized with Firebase.");
-            }).catch(error => {
-                console.error("Failed to initialize app with Firebase:", error);
-            });
+            setActiveScreen('checklistScreen');
+            renderChecklistItems();
+            renderCities();
+            renderUsefulWords(); 
+            updateConversionRateText();
         });
     </script>
 </body>
