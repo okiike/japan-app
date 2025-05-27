@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Planificateur de Voyage Japon</title>
     <style>
-        /* Styles généraux - Dark Mode par défaut inspiré d'Apple */
+        /* Styles généraux - Thème Sombre (Défaut) */
         :root {
             --bg-color: #1c1c1e; 
             --secondary-bg-color: #2c2c2e; 
@@ -22,6 +22,35 @@
             --icon-active-color: var(--accent-color);
             --font-family-system: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
+
+        /* Thème Clair */
+        body.theme-light {
+            --bg-color: #f2f2f7;
+            --secondary-bg-color: #ffffff;
+            --tertiary-bg-color: #e5e5ea;
+            --text-color-primary: #000000;
+            --text-color-secondary: #3c3c43; /* Opacité 0.6 */
+            --text-color-tertiary: #3c3c43; /* Opacité 0.3 */
+            --accent-color: #007aff;
+            --destructive-color: #ff3b30;
+            --highlight-color: #ff9500;
+            --border-color: #c6c6c8;
+            --separator-color: #c6c6c8;
+            --icon-color: var(--text-color-tertiary);
+            --icon-active-color: var(--accent-color);
+        }
+        body.theme-light .button.add-button, 
+        body.theme-light .button.ai-button { 
+             color: #ffffff;
+        }
+        body.theme-light .button.secondary-button {
+            color: var(--text-color-primary);
+            background-color: #e5e5ea; 
+        }
+         body.theme-light .button.secondary-button:hover {
+            background-color: #d1d1d6;
+        }
+
 
         *, *::before, *::after {
             box-sizing: border-box;
@@ -41,12 +70,14 @@
             display: flex;
             flex-direction: column;
             height: 100%;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         .status-bar-placeholder {
             height: 20px; 
             background-color: var(--bg-color);
             flex-shrink: 0;
+            transition: background-color 0.3s;
         }
 
         .main-content {
@@ -60,6 +91,7 @@
             display: none;
             padding: 20px; 
             background-color: var(--bg-color); 
+            transition: background-color 0.3s;
         }
 
         .screen.active {
@@ -94,6 +126,7 @@
             padding-bottom: env(safe-area-inset-bottom);
             position: relative;
             z-index: 100;
+            transition: background-color 0.3s, border-color 0.3s;
         }
 
         .tab-item {
@@ -129,6 +162,7 @@
             color: var(--text-color-primary); border: 1px solid var(--border-color);
             border-radius: 8px; padding: 12px 15px; font-size: 16px;
             font-family: var(--font-family-system);
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
         }
         .text-input::placeholder, .textarea-input::placeholder { color: var(--text-color-tertiary); }
         .textarea-input { min-height: 60px; resize: vertical; }
@@ -139,7 +173,7 @@
             border: none; font-size: 16px; font-weight: 500; 
             cursor: pointer; display: flex; align-items: center;
             justify-content: center; gap: 8px;
-            transition: background-color 0.2s ease;
+            transition: background-color 0.2s ease, filter 0.2s ease;
         }
         .add-button { background-color: var(--accent-color); }
         .ai-button { background-color: var(--highlight-color); }
@@ -152,8 +186,9 @@
         .scroll-container { 
             overflow-y: auto; background-color: var(--secondary-bg-color); 
             border-radius: 10px; padding: 0px; margin-bottom: 10px;
+            transition: background-color 0.3s;
         }
-        .checklist-scroll-container { max-height: calc(100vh - 350px); } 
+        .checklist-scroll-container { max-height: calc(100vh - 380px); } 
         .cities-scroll-container { max-height: calc(100vh - 270px); }
         .info-scroll-container { max-height: calc(100vh - 180px); }
         .itinerary-scroll-container { max-height: calc(100vh - 320px); } 
@@ -164,6 +199,7 @@
             padding: 0; 
             background-color: transparent; 
             border-bottom: 1px solid var(--separator-color);
+            transition: border-color 0.3s;
         }
         .list-item:last-child { border-bottom: none; }
         
@@ -212,25 +248,36 @@
         .city-container { 
             background-color: var(--secondary-bg-color); 
             border-radius: 10px; overflow: hidden; margin-bottom: 10px; 
+            transition: background-color 0.3s;
         }
         .city-header {
             display: flex; justify-content: space-between; align-items: center;
             padding: 15px; background-color: var(--tertiary-bg-color); 
             cursor: pointer; border-bottom: 1px solid var(--border-color); 
+            transition: background-color 0.3s, border-color 0.3s;
         }
         .city-header:hover { background-color: #4a4a4c; }
+        body.theme-light .city-header:hover { background-color: #dcdcdf; }
+
         .city-header-main { flex-grow: 1; display: flex; align-items: center; }
         .city-name { font-size: 20px; font-weight: 500; color: var(--text-color-primary); }
+        .city-color-indicator {
+            width: 12px; height: 12px; border-radius: 50%;
+            margin-right: 8px; display: inline-block;
+            border: 1px solid var(--border-color);
+        }
         .city-expand-icon-placeholder { 
             width: 20px; height: 20px; color: var(--text-color-tertiary);
             margin-left: 12px; display: flex; align-items: center; justify-content: center;
         }
-        .city-actions { display: flex; align-items: center; }
-        .city-ai-button { 
+        .city-actions { display: flex; align-items: center; gap: 5px;}
+        .city-ai-button, .city-edit-button { 
             background-color: var(--highlight-color); color: var(--text-color-primary); 
-            padding: 8px 12px; font-size: 13px; margin-left: 12px; font-weight: 500;
+            padding: 8px 12px; font-size: 13px; font-weight: 500;
         }
+        .city-edit-button { background-color: var(--accent-color); }
         .delete-city-button-placeholder { padding: 8px; }
+
 
         .attractions-container { padding: 0; background-color: var(--secondary-bg-color); display: none; }
         .attractions-container.expanded { display: block; }
@@ -239,6 +286,11 @@
             background-color: var(--tertiary-bg-color); 
             padding: 10px 15px; margin: 0;
             border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center;
+        }
+        .category-color-indicator {
+            width: 10px; height: 10px; border-radius: 3px;
+            margin-right: 8px; display: inline-block;
         }
         
         .attraction-item-wrapper {
@@ -268,9 +320,11 @@
             line-height: 1.4; word-break: break-word;
             cursor: pointer;
             font-weight: 500; 
+            font-style: normal !important; /* Ensure not italic */
         }
         .attraction-text.completed { text-decoration: line-through; color: var(--text-color-tertiary); }
-        .attraction-text.ai-suggestion { font-style: italic; color: var(--highlight-color); }
+        /* .attraction-text.ai-suggestion { font-style: italic; color: var(--highlight-color); } REMOVED ITALIC */
+        .attraction-text.ai-suggestion { color: var(--highlight-color); }
         
         .attraction-description {
             font-size: 14px;
@@ -327,6 +381,7 @@
             margin-bottom: 20px; padding: 15px;
             background-color: var(--secondary-bg-color); 
             border-radius: 10px; border: 1px solid var(--border-color);
+            transition: background-color 0.3s, border-color 0.3s;
         }
         .info-section-title {
             font-size: 18px; font-weight: 600;
@@ -374,8 +429,31 @@
         }
         .itinerary-form-buttons {
             display: flex;
-            gap: 10px; /* Space between buttons */
+            gap: 10px;
         }
+        .itinerary-path-container {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: var(--secondary-bg-color);
+            border-radius: 8px;
+        }
+        .itinerary-path-item {
+            display: inline-flex; 
+            align-items: center;
+            padding: 5px 8px;
+            border-radius: 6px;
+            margin-right: 5px; 
+            margin-bottom: 5px; 
+            font-size: 14px;
+            color: var(--text-color-primary); 
+        }
+        .itinerary-path-item .svg-icon { 
+            margin-left: 8px;
+            margin-right: 8px;
+            fill: var(--text-color-tertiary);
+        }
+
+
         .timeline {
             position: relative;
             padding: 20px 0;
@@ -412,13 +490,32 @@
             padding: 15px;
             border-radius: 8px;
             border: 1px solid var(--border-color);
+            position: relative; 
         }
         .timeline-city { font-size: 18px; font-weight: 600; color: var(--text-color-primary); margin-bottom: 5px; }
         .timeline-dates { font-size: 14px; color: var(--text-color-secondary); margin-bottom: 8px; }
         .timeline-duration { font-size: 13px; color: var(--text-color-tertiary); margin-bottom: 8px; }
         .timeline-notes { font-size: 14px; color: var(--text-color-secondary); margin-bottom: 8px; }
         .timeline-train-cost { font-size: 13px; color: var(--highlight-color); font-style: italic; }
-        .timeline-item-actions button { margin-top:10px; margin-right: 5px;}
+        .timeline-item-actions { display: flex; gap: 8px; margin-top:10px; align-items: center; justify-content: flex-end; }
+        .timeline-item-actions button { margin-right: 0px;} 
+        .reorder-buttons {
+            position: absolute;
+            top: 15px; 
+            left: -40px; 
+            display: flex;
+            flex-direction: column;
+            gap: 8px; /* Increased gap */
+            z-index: 1; 
+        }
+        .reorder-buttons button {
+            background: none; border: none; padding: 0; /* Removed padding for tighter icon */
+            cursor: pointer; color: var(--text-color-tertiary);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .reorder-buttons button .svg-icon { width: 20px; height: 20px;} /* Slightly larger icons */
+        .reorder-buttons button:hover { color: var(--accent-color); }
+
 
         /* JR Pass Calculator Styles */
         #jrPassResultContainer {
@@ -449,6 +546,79 @@
             list-style-type: disc;
             padding-left: 20px;
         }
+        
+        /* Checklist Sort Buttons */
+        .sort-buttons-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap; 
+        }
+        .sort-buttons-container .button {
+            font-size: 13px;
+            padding: 6px 10px;
+            background-color: var(--tertiary-bg-color);
+            color: var(--text-color-secondary);
+        }
+        .sort-buttons-container .button.active {
+            background-color: var(--accent-color);
+            color: #ffffff;
+        }
+
+
+        /* City Edit Modal (Basic Styling) */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1001; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.6); 
+            padding-top: 60px;
+        }
+        .modal-content {
+            background-color: var(--secondary-bg-color);
+            margin: 5% auto; 
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            width: 80%; 
+            max-width: 500px;
+        }
+        .modal-content h3 { color: var(--text-color-primary); margin-top: 0;}
+        .close-button {
+            color: var(--text-color-tertiary);
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: var(--text-color-primary);
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .color-palette {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .color-option.selected {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px var(--accent-color);
+        }
+
 
     </style>
 </head>
@@ -464,6 +634,12 @@
             <div class="input-container">
                 <input type="text" id="newItemInput" class="text-input" placeholder="Ajouter une tâche...">
                 <button id="addItemButton" class="button add-button">Ajouter</button>
+            </div>
+             <div class="sort-buttons-container" id="checklistSortButtons">
+                <button class="button" data-sort="recent">Par ajout (récent)</button>
+                <button class="button" data-sort="oldest">Par ajout (ancien)</button>
+                <button class="button" data-sort="incomplete">Non complétées</button>
+                <button class="button" data-sort="complete">Complétées</button>
             </div>
             <button id="suggestTasksButton" class="button ai-button">
                 <span id="aiButtonSuggestTaskIconPlaceholder"></span>
@@ -483,8 +659,11 @@
         
         <div id="itineraryScreen" class="screen">
             <h1 class="screen-title">Mon itinéraire (15 Nov - 29 Nov 2025)</h1>
+            <div id="itineraryPathContainer" class="itinerary-path-container">
+                </div>
             <form id="itineraryForm">
-                <input type="hidden" id="editingItineraryStopId"> <div class="form-group">
+                <input type="hidden" id="editingItineraryStopId"> 
+                <div class="form-group">
                     <label for="itineraryCitySelect">Ville :</label>
                     <select id="itineraryCitySelect" class="select-input"></select>
                 </div>
@@ -513,6 +692,17 @@
             <h1 class="screen-title">Infos pratiques</h1>
             <div class="info-scroll-container">
                 <div class="info-section">
+                    <h2 class="info-section-title">Paramètres d'affichage</h2>
+                    <div class="form-group">
+                        <label for="themeSelect">Thème de l'application :</label>
+                        <select id="themeSelect" class="select-input">
+                            <option value="dark">Thème Sombre (Défaut)</option>
+                            <option value="light">Thème Clair</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="info-section">
                     <h2 class="info-section-title">Convertisseur de devises</h2>
                     <div class="converter-container">
                         <div class="converter-row">
@@ -536,20 +726,25 @@
                 </div>
 
                 <div class="info-section">
-                    <h2 class="info-section-title">Calculateur de rentabilité JR Pass</h2>
-                    <p class="info-text" style="margin-bottom:10px;">Cet outil vous aide à estimer si un Japan Rail Pass serait rentable pour votre voyage, basé sur l'itinéraire que vous avez défini.</p>
+                    <h2 class="info-section-title">Japan Rail Pass</h2>
+                    <p class="info-list-item">• Forfait économique pour voyager en train à travers le Japon.</p>
+                    <p class="info-list-item">• Valable sur la plupart des lignes JR, y compris de nombreux Shinkansen (trains à grande vitesse).</p>
+                    <p class="info-list-item">• Disponible pour des durées de 7, 14, ou 21 jours consécutifs.</p>
+                    <p class="info-list-item">• Prix (approximatifs, peuvent varier) :
+                        <ul>
+                            <li>7 jours : ~¥50,000</li>
+                            <li>14 jours : ~¥80,000</li>
+                            <li>21 jours : ~¥100,000</li>
+                        </ul>
+                    </p>
+                     <p class="info-list-item">• Doit généralement être acheté avant votre arrivée au Japon (bien que des options d'achat sur place existent, souvent plus chères).</p>
+                    <h3 style="margin-top: 20px; font-size: 16px; font-weight: 500;">Calculateur de rentabilité :</h3>
+                    <p class="info-text" style="margin-bottom:10px;">Cet outil vous aide à estimer si un JR Pass serait rentable pour votre voyage, basé sur l'itinéraire que vous avez défini.</p>
                     <button id="calculateJrPassButton" class="button add-button" style="margin-bottom: 15px; width: 100%;">Calculer pour mon itinéraire</button>
                     <div id="jrPassResultContainer" style="display: none;">
                         </div>
                 </div>
 
-                <div class="info-section">
-                    <h2 class="info-section-title">Japan Rail (JR) Pass</h2>
-                    <p class="info-list-item">• Forfait économique pour voyager en train.</p>
-                    <p class="info-list-item">• Valable sur la plupart des lignes JR (Shinkansen inclus).</p>
-                    <p class="info-list-item">• Durées : 7, 14, ou 21 jours.</p>
-                    <p class="info-list-item">• Achat avant départ généralement requis.</p>
-                </div>
                 <div class="info-section">
                     <h2 class="info-section-title">Numéros d'urgence</h2>
                     <p class="info-list-item">• Police : 110</p>
@@ -559,6 +754,26 @@
             </div>
         </div>
     </div>
+
+    <div id="editCityModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeCityModal">×</span>
+            <h3>Modifier les détails de la ville</h3>
+            <input type="hidden" id="editingCityIdModal">
+            <div class="form-group">
+                <label for="cityNameModalInput">Nom de la ville :</label>
+                <input type="text" id="cityNameModalInput" class="text-input">
+            </div>
+            <div class="form-group">
+                <label for="cityColorPalette">Couleur :</label>
+                <div id="cityColorPalette" class="color-palette">
+                    </div>
+                <input type="hidden" id="cityColorModalInputHidden">
+            </div>
+            <button id="saveCityModalButton" class="button add-button">Sauvegarder</button>
+        </div>
+    </div>
+
 
     <div class="tab-bar">
         <button class="tab-item active" data-screen="checklistScreen">
@@ -581,7 +796,7 @@
 
     <script>
         // --- Définitions des Icônes SVG ---
-        const icons = {
+        const icons = { 
             checklist: '<svg class="svg-icon large" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2ZM18 20H6V4H13V9H18V20ZM8 11H16V13H8V11ZM8 15H16V17H8V15Z"/></svg>',
             cities: '<svg class="svg-icon large" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2ZM12 11.5C10.62 11.5 9.5 10.38 9.5 9C9.5 7.62 10.62 6.5 12 6.5C13.38 6.5 14.5 7.62 14.5 9C14.5 10.38 13.38 11.5 12 11.5Z"/></svg>',
             info: '<svg class="svg-icon large" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 17C11.45 17 11 16.55 11 16V12C11 11.45 11.45 11 12 11C12.55 11 13 11.45 13 12V16C13 16.55 12.55 17 12 17ZM12 9C11.45 9 11 8.55 11 8C11 7.45 11.45 7 12 7C12.55 7 13 7.45 13 8C13 8.55 12.55 9 12 9Z"/></svg>',
@@ -597,10 +812,14 @@
             chevronUp: '<svg class="svg-icon small" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6l-6 6l1.41 1.41z"/></svg>',
             mapMarker: '<svg class="svg-icon small" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>',
             calendar: '<svg class="svg-icon small" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>',
-            edit: '<svg class="svg-icon small" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>'
+            edit: '<svg class="svg-icon small" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>',
+            arrowUp: '<svg class="svg-icon small" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6l-6 6z"/></svg>',
+            arrowDown: '<svg class="svg-icon small" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6l-6 6z"/></svg>',
+            food: '<svg class="svg-icon small" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M16 6v8h3v8h-3v-2h-2v2H8v-2H6v2H3V14h3V6H3V4h3V2h8v2h3v2h-3zm-2 0H8v6h6V6zm0 8H8v6h6v-6z"/></svg>', 
+            route: '<svg class="svg-icon large" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M19.41,6.59 C19.02,6.2 18.39,6.2 18,6.59 L12,12.59 L6,6.59 C5.61,6.2 4.98,6.2 4.59,6.59 C4.2,6.98 4.2,7.61 4.59,8 L11.29,14.71 C11.68,15.1 12.31,15.1 12.7,14.71 L19.41,8 C19.8,7.61 19.8,6.98 19.41,6.59 Z M12,2 C6.48,2 2,6.48 2,12 C2,17.52 6.48,22 12,22 C17.52,22 22,17.52 22,12 C22,6.48 17.52,2 12,2 Z M12,20 C7.59,20 4,16.41 4,12 C4,7.59 7.59,4 12,4 C16.41,4 20,7.59 20,12 C20,16.41 16.41,20 12,20 Z"/></svg>' 
         };
 
-        const LOCAL_STORAGE_KEY = 'japanTripPlannerData_v3';
+        const LOCAL_STORAGE_KEY = 'japanTripPlannerData_v4'; 
         let currentExchangeRate = 160; 
         
         const TRIP_START_DATE = '2025-11-15';
@@ -611,7 +830,8 @@
         let usefulWords = [];
         let itineraryData = [];
         let editingItineraryStopId = null; 
-        let japaneseVoice = null; // For TTS
+        let japaneseVoice = null; 
+        let currentChecklistSort = 'recent'; 
         
         const jrPassPrices = { 
             7: 50000,
@@ -619,10 +839,34 @@
             21: 100000
         };
 
+        const cityColorPalette = [
+            { name: "Rouge Fuji", value: "#D90429" }, { name: "Rose Sakura", value: "#FFB7C5" },
+            { name: "Orange Yuzu", value: "#FF8C00" }, { name: "Jaune Ginkgo", value: "#FFD700" },
+            { name: "Vert Matcha", value: "#6B8E23" }, { name: "Bleu Aizome", value: "#0072BB" },
+            { name: "Violet Ajisai", value: "#8A2BE2" }, { name: "Gris Kumo", value: "#808080" },
+            { name: "Brun Sugi", value: "#A0522D" }, { name: "Noir Sumi", value: "#2F4F4F" }
+        ];
+
+
+        const activityCategoryStyles = {
+            "Culturel": { color: "#8e44ad", icon: "🏛️" }, 
+            "Nature": { color: "#27ae60", icon: "🌳" },   
+            "Nourriture": { color: "#e67e22", icon: "🍜" },
+            "Shopping": { color: "#3498db", icon: "🛍️" }, 
+            "Monument": { color: "#7f8c8d", icon: "🗿" }, 
+            "Point d'intérêt": { color: "#f1c40f", icon: "📍" }, 
+            "Nourriture & Restaurants": { color: "#e74c3c", icon: "🍽️" }, 
+            "Suggestion": { color: "#95a5a6", icon: "💡" }, 
+            "Autre": { color: "#bdc3c7", icon: "➡️" } 
+        };
+
+
         const domElements = {
+            body: document.body,
             screens: document.querySelectorAll('.screen'),
             tabItems: document.querySelectorAll('.tab-item'),
             checklistItemsContainer: document.getElementById('checklistItemsContainer'),
+            checklistSortButtonsContainer: document.getElementById('checklistSortButtons'),
             newItemInput: document.getElementById('newItemInput'),
             addItemButton: document.getElementById('addItemButton'),
             suggestTasksButton: document.getElementById('suggestTasksButton'),
@@ -651,10 +895,19 @@
             addItineraryStopButton: document.getElementById('addItineraryStopButton'),
             cancelEditItineraryButton: document.getElementById('cancelEditItineraryButton'),
             itineraryTimelineContainer: document.getElementById('itineraryTimelineContainer'),
+            itineraryPathContainer: document.getElementById('itineraryPathContainer'),
             calculateJrPassButton: document.getElementById('calculateJrPassButton'),
-            jrPassResultContainer: document.getElementById('jrPassResultContainer')
+            jrPassResultContainer: document.getElementById('jrPassResultContainer'),
+            themeSelect: document.getElementById('themeSelect'),
+            editCityModal: document.getElementById('editCityModal'),
+            closeCityModalButton: document.getElementById('closeCityModal'),
+            editingCityIdModalInput: document.getElementById('editingCityIdModal'),
+            cityNameModalInput: document.getElementById('cityNameModalInput'),
+            cityColorPaletteDiv: document.getElementById('cityColorPalette'),
+            cityColorModalInputHidden: document.getElementById('cityColorModalInputHidden'),
+            saveCityModalButton: document.getElementById('saveCityModalButton'),
         };
-
+        
         function generateId(prefix = 'item') {
             return `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
         }
@@ -665,7 +918,8 @@
                     checklist: checklistItems,
                     cities: citiesData,
                     words: usefulWords,
-                    itinerary: itineraryData
+                    itinerary: itineraryData,
+                    theme: domElements.body.className 
                 };
                 localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(dataToSave));
             } catch (error) {
@@ -679,14 +933,21 @@
             if (savedData) {
                 try {
                     const parsedData = JSON.parse(savedData);
-                    checklistItems = (parsedData.checklist || []).map(item => ({ ...item, id: item.id || generateId('checklist'), description: item.description || '', isExpanded: item.isExpanded || false }));
+                    checklistItems = (parsedData.checklist || []).map(item => ({ ...item, id: item.id || generateId('checklist'), description: item.description || '', isExpanded: item.isExpanded || false, createdAt: item.createdAt || Date.now() }));
                     citiesData = (parsedData.cities || []).map(city => ({ 
                         ...city, 
                         id: city.id || generateId('city'),
+                        color: city.color || getRandomColor(), 
                         attractions: (city.attractions || []).map(attr => ({...attr, id: attr.id || generateId('attr'), description: attr.description || ''})) 
                     }));
                     usefulWords = (parsedData.words || []).map(word => ({ ...word, id: word.id || generateId('word') }));
                     itineraryData = (parsedData.itinerary || []).map(stop => ({ ...stop, id: stop.id || generateId('itinerary')}));
+                    
+                    if (parsedData.theme) {
+                        applyTheme(parsedData.theme);
+                        if (domElements.themeSelect) domElements.themeSelect.value = parsedData.theme.replace('theme-','');
+                    }
+
 
                 } catch (error) {
                     console.error("Erreur lors du chargement des données:", error);
@@ -699,15 +960,15 @@
 
         function initializeDefaultDataArrays() {
             checklistItems = [ 
-                { id: generateId('checklist'), text: 'Réserver les vols', completed: false, description: '', isExpanded: false }, 
-                { id: generateId('checklist'), text: 'Réserver les hébergements', completed: false, description: '', isExpanded: false }
+                { id: generateId('checklist'), text: 'Réserver les vols', completed: false, description: '', isExpanded: false, createdAt: Date.now() - 20000 }, 
+                { id: generateId('checklist'), text: 'Réserver les hébergements', completed: false, description: '', isExpanded: false, createdAt: Date.now() - 10000 }
             ];
             citiesData = [ 
-                { id: generateId('city'), name: 'Tokyo', isExpanded: false, attractions: [
+                { id: generateId('city'), name: 'Tokyo', color: getRandomColor(), isExpanded: false, attractions: [
                     { id: generateId('attr'), text: 'Traversée de Shibuya', category: 'Point d\'intérêt', price: 'Gratuit', completed: false, description: 'Le passage piéton le plus fréquenté au monde.' },
                     { id: generateId('attr'), text: 'Tour de Tokyo', category: 'Monument', price: '¥¥', completed: false, description: 'Tour d\'observation et de communication inspirée de la Tour Eiffel.' }
                 ]},
-                { id: generateId('city'), name: 'Kyoto', isExpanded: false, attractions: [
+                { id: generateId('city'), name: 'Kyoto', color: getRandomColor(), isExpanded: false, attractions: [
                     { id: generateId('attr'), text: 'Kinkaku-ji (Pavillon d\'Or)', category: 'Culturel', price: '¥', completed: false, description: 'Célèbre temple Zen recouvert de feuilles d\'or.' }
                 ]}
             ];
@@ -770,12 +1031,42 @@
              if (screenId === 'infoScreen' && domElements.calculateJrPassButton) { 
                 domElements.calculateJrPassButton.addEventListener('click', calculateAndDisplayJrPassProfitability);
             }
+            if (screenId === 'checklistScreen' && domElements.checklistSortButtonsContainer) {
+                 updateActiveSortButton();
+            }
         }
         domElements.tabItems.forEach(tab => tab.addEventListener('click', () => setActiveScreen(tab.dataset.screen)));
 
         // --- Checklist Fonctions ---
+        function sortChecklistItems() {
+            switch (currentChecklistSort) {
+                case 'recent':
+                    checklistItems.sort((a, b) => b.createdAt - a.createdAt);
+                    break;
+                case 'oldest':
+                    checklistItems.sort((a, b) => a.createdAt - b.createdAt);
+                    break;
+                case 'incomplete':
+                    checklistItems.sort((a, b) => a.completed - b.completed || b.createdAt - a.createdAt);
+                    break;
+                case 'complete':
+                    checklistItems.sort((a, b) => b.completed - a.completed || b.createdAt - a.createdAt);
+                    break;
+                default:
+                    checklistItems.sort((a, b) => b.createdAt - a.createdAt); // Default to recent
+            }
+        }
+        
+        function updateActiveSortButton() {
+            document.querySelectorAll('#checklistSortButtons .button').forEach(button => {
+                button.classList.toggle('active', button.dataset.sort === currentChecklistSort);
+            });
+        }
+
+
         function renderChecklistItems() {
             if (!domElements.checklistItemsContainer) return;
+            sortChecklistItems(); // Sort before rendering
             domElements.checklistItemsContainer.innerHTML = '';
             checklistItems.forEach(item => {
                 const listItemDiv = document.createElement('div'); 
@@ -840,6 +1131,7 @@
                 listItemDiv.appendChild(descriptionArea);
                 domElements.checklistItemsContainer.appendChild(listItemDiv);
             });
+            updateActiveSortButton();
         }
 
         function toggleChecklistItemCompleted(id) { 
@@ -873,7 +1165,7 @@
         }
         function addChecklistItem() {
             const text = domElements.newItemInput.value.trim(); if (text === '') return;
-            checklistItems.push({ id: generateId('checklist'), text: text, completed: false, description: '', isExpanded: false });
+            checklistItems.push({ id: generateId('checklist'), text: text, completed: false, description: '', isExpanded: false, createdAt: Date.now() });
             domElements.newItemInput.value = ''; 
             renderChecklistItems(); 
             saveData();
@@ -888,15 +1180,78 @@
                 const suggestionsText = await generateContentWithGemini(prompt);
                 suggestionsText.split('\n').filter(task => task.trim() !== '').forEach(taskText => {
                     if (!checklistItems.some(item => item.text.toLowerCase() === taskText.toLowerCase().trim())) {
-                        checklistItems.push({ id: generateId('checklist-ai'), text: taskText.trim(), completed: false, isAISuggestion: true, description: '', isExpanded: false });
+                        checklistItems.push({ id: generateId('checklist-ai'), text: taskText.trim(), completed: false, isAISuggestion: true, description: '', isExpanded: false, createdAt: Date.now() });
                     }
                 });
                 renderChecklistItems(); saveData();
             } catch (error) { console.error("Erreur suggestion tâches:", error); }
         }
         domElements.suggestTasksButton.addEventListener('click', suggestNewTasks);
+        if (domElements.checklistSortButtonsContainer) {
+            domElements.checklistSortButtonsContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('button')) {
+                    currentChecklistSort = e.target.dataset.sort;
+                    renderChecklistItems();
+                }
+            });
+        }
+
 
         // --- Villes & Activités Fonctions ---
+        function openEditCityModal(cityId) {
+            const city = citiesData.find(c => c.id === cityId);
+            if (!city) return;
+            domElements.editingCityIdModalInput.value = city.id;
+            domElements.cityNameModalInput.value = city.name;
+            domElements.cityColorModalInputHidden.value = city.color || '#808080'; 
+            
+            domElements.cityColorPaletteDiv.innerHTML = '';
+            cityColorPalette.forEach(color => {
+                const colorDiv = document.createElement('div');
+                colorDiv.className = 'color-option';
+                colorDiv.style.backgroundColor = color.value;
+                colorDiv.dataset.colorValue = color.value;
+                colorDiv.title = color.name; 
+                if (color.value === (city.color || '#808080')) {
+                    colorDiv.classList.add('selected');
+                }
+                colorDiv.addEventListener('click', () => {
+                    document.querySelectorAll('#cityColorPalette .color-option').forEach(opt => opt.classList.remove('selected'));
+                    colorDiv.classList.add('selected');
+                    domElements.cityColorModalInputHidden.value = color.value;
+                });
+                domElements.cityColorPaletteDiv.appendChild(colorDiv);
+            });
+
+            domElements.editCityModal.style.display = 'block';
+        }
+
+        function closeEditCityModal() {
+            domElements.editCityModal.style.display = 'none';
+        }
+
+        function saveCityDetails() {
+            const cityId = domElements.editingCityIdModalInput.value;
+            const newName = domElements.cityNameModalInput.value.trim();
+            const newColor = domElements.cityColorModalInputHidden.value;
+
+            if (!newName) {
+                showErrorMessage("Le nom de la ville ne peut pas être vide.");
+                return;
+            }
+            const city = citiesData.find(c => c.id === cityId);
+            if (city) {
+                city.name = newName;
+                city.color = newColor || '#808080';
+                renderCities();
+                populateItineraryCitySelect();
+                renderItinerary(); 
+                saveData();
+            }
+            closeEditCityModal();
+        }
+
+
         function renderCities() {
             if (!domElements.citiesListContainer) return;
             domElements.citiesListContainer.innerHTML = '';
@@ -904,21 +1259,51 @@
                 const cityCard = document.createElement('div'); cityCard.className = 'city-container'; cityCard.dataset.id = city.id;
                 const header = document.createElement('div'); header.className = 'city-header';
                 const headerMain = document.createElement('div'); headerMain.className = 'city-header-main';
-                headerMain.innerHTML = `<span class="city-name">${city.name}</span>`;
+                
+                const colorIndicator = document.createElement('span');
+                colorIndicator.className = 'city-color-indicator';
+                colorIndicator.style.backgroundColor = city.color || 'var(--tertiary-bg-color)';
+                headerMain.appendChild(colorIndicator);
+                
+                const cityNameSpan = document.createElement('span');
+                cityNameSpan.className = 'city-name';
+                cityNameSpan.textContent = city.name;
+                headerMain.appendChild(cityNameSpan);
+
                 const expandIconPlaceholder = document.createElement('span'); expandIconPlaceholder.className = 'city-expand-icon-placeholder';
                 expandIconPlaceholder.innerHTML = city.isExpanded ? icons.minus : icons.plus;
                 headerMain.appendChild(expandIconPlaceholder);
                 headerMain.addEventListener('click', () => { city.isExpanded = !city.isExpanded; renderCities(); saveData(); });
                 
                 const cityActionsDiv = document.createElement('div'); cityActionsDiv.className = 'city-actions';
+                
+                const editCityButton = document.createElement('button');
+                editCityButton.className = 'button city-edit-button small-button';
+                editCityButton.innerHTML = icons.edit + ' Modifier';
+                editCityButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openEditCityModal(city.id);
+                });
+                cityActionsDiv.appendChild(editCityButton);
+
                 const aiButton = document.createElement('button'); aiButton.className = 'button city-ai-button small-button';
                 aiButton.innerHTML = icons.sparkle + ' Générer des idées d\'activités';
                 aiButton.addEventListener('click', (e) => { e.stopPropagation(); suggestCityAttractions(city.id); });
+                cityActionsDiv.appendChild(aiButton);
+                
+                const suggestFoodButton = document.createElement('button');
+                suggestFoodButton.className = 'button small-button'; 
+                suggestFoodButton.style.backgroundColor = '#c0392b'; 
+                suggestFoodButton.innerHTML = icons.food + ' Suggérer Restaurants';
+                suggestFoodButton.addEventListener('click', (e) => { e.stopPropagation(); suggestFoodForCity(city.id); });
+                cityActionsDiv.appendChild(suggestFoodButton);
+
+
                 const deleteCityBtnPlaceholder = document.createElement('span'); deleteCityBtnPlaceholder.className = 'delete-button-placeholder delete-city-button-placeholder';
                 deleteCityBtnPlaceholder.innerHTML = icons.trash;
                 deleteCityBtnPlaceholder.addEventListener('click', (e) => { e.stopPropagation(); deleteCity(city.id); });
                 
-                cityActionsDiv.appendChild(aiButton); cityActionsDiv.appendChild(deleteCityBtnPlaceholder);
+                cityActionsDiv.appendChild(deleteCityBtnPlaceholder);
                 header.appendChild(headerMain); header.appendChild(cityActionsDiv);
                 
                 const attractionsContainer = document.createElement('div'); attractionsContainer.className = 'attractions-container';
@@ -931,7 +1316,15 @@
 
                     Object.keys(attractionsByCategory).sort().forEach(category => {
                         const categoryDiv = document.createElement('div'); categoryDiv.className = 'attraction-category';
-                        const categoryTitle = document.createElement('h3'); categoryTitle.className = 'attraction-category-title'; categoryTitle.textContent = category;
+                        const categoryTitle = document.createElement('h3'); categoryTitle.className = 'attraction-category-title'; 
+                        
+                        const categoryStyle = activityCategoryStyles[category] || activityCategoryStyles["Autre"];
+                        const categoryColorIndicator = document.createElement('span');
+                        categoryColorIndicator.className = 'category-color-indicator';
+                        categoryColorIndicator.style.backgroundColor = categoryStyle.color;
+                        categoryTitle.appendChild(categoryColorIndicator);
+                        categoryTitle.appendChild(document.createTextNode(category)); 
+                        
                         categoryDiv.appendChild(categoryTitle);
                         
                         attractionsByCategory[category].sort((a,b) => a.text.localeCompare(b.text)).forEach(attraction => {
@@ -953,8 +1346,8 @@
                             const textSpan = document.createElement('span'); 
                             textSpan.className = 'attraction-text';
                             if (attraction.completed) textSpan.classList.add('completed');
-                            if (attraction.isAISuggestion) textSpan.classList.add('ai-suggestion');
-                            textSpan.textContent = attraction.text;
+                            if (attraction.isAISuggestion) textSpan.classList.add('ai-suggestion'); 
+                            textSpan.textContent = attraction.text.replace(/\*\*/g, ''); 
                             textSpan.addEventListener('click', () => toggleCityAttractionCompleted(city.id, attraction.id));
                             contentDiv.appendChild(textSpan);
 
@@ -977,7 +1370,7 @@
                             mapButton.innerHTML = icons.mapMarker + ' Maps';
                             mapButton.addEventListener('click', (e) => {
                                 e.stopPropagation();
-                                const query = encodeURIComponent(`${attraction.text}, ${city.name}, Japon`);
+                                const query = encodeURIComponent(`${attraction.text.replace(/\*\*/g, '')}, ${city.name}, Japon`);
                                 window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank'); 
                             });
                             contentDiv.appendChild(mapButton);
@@ -1061,12 +1454,16 @@
             saveData();
         }
 
+        function getRandomColor() {
+            return cityColorPalette[Math.floor(Math.random() * cityColorPalette.length)].value;
+        }
+
 
         function addCity() { 
             const cityName = domElements.newCityInput.value.trim();
             if (cityName === '') { showErrorMessage("Le nom de la ville est requis."); return; }
             if (citiesData.some(city => city.name.toLowerCase() === cityName.toLowerCase())) { showErrorMessage("Cette ville existe déjà."); return; }
-            citiesData.push({ id: generateId('city'), name: cityName, isExpanded: false, attractions: [] });
+            citiesData.push({ id: generateId('city'), name: cityName, color: getRandomColor(), isExpanded: false, attractions: [] });
             domElements.newCityInput.value = ''; 
             renderCities(); 
             populateItineraryCitySelect(); 
@@ -1105,10 +1502,21 @@
         }
         async function suggestCityAttractions(cityId) { 
             const city = citiesData.find(c => c.id === cityId); if (!city) return;
-            const existingAttractionsText = (city.attractions || []).map(attr => `- ${attr.text}`).join('\n');
-            const prompt = `Pour la ville de ${city.name} au Japon, suggère 2-3 activités ou lieux touristiques intéressants, en plus de ceux-ci (s'il y en a):\n${existingAttractionsText}\n\nPour chaque suggestion, donne le nom, une catégorie (ex: Culturel, Nature, Nourriture, Shopping, Point d'intérêt, Monument), une estimation de prix (Gratuit, ¥, ¥¥, ¥¥¥, ou N/A), et une très courte description (max 15 mots).
-Ne répète pas les attractions existantes.
-Format exact pour chaque suggestion (une par ligne): NOM_ATTRACTION;CATEGORIE;PRIX;DESCRIPTION_COURTE
+
+            let durationInCity = 3; 
+            const itineraryStop = itineraryData.find(stop => stop.cityId === cityId);
+            if (itineraryStop) {
+                durationInCity = parseInt(itineraryStop.durationNights) + 1; 
+            }
+            
+            let numberOfSuggestions = 3; 
+            if (durationInCity <= 2) numberOfSuggestions = 2;
+            else if (durationInCity >= 5) numberOfSuggestions = 4;
+
+
+            const existingAttractionsText = (city.attractions || []).filter(attr => attr.category !== "Nourriture & Restaurants").map(attr => `- ${attr.text}`).join('\n');
+            const prompt = `Pour la ville de ${city.name} au Japon, où je prévois de rester environ ${durationInCity} jours, suggère ${numberOfSuggestions} activités ou lieux touristiques intéressants (pas de restaurants ou nourriture ici), en plus de ceux-ci (s'il y en a):\n${existingAttractionsText}\n\nPour chaque suggestion, donne le nom, une catégorie (ex: Culturel, Nature, Shopping, Point d'intérêt, Monument), une estimation de prix (Gratuit, ¥, ¥¥, ¥¥¥, ou N/A), et une très courte description (max 15 mots).
+Ne répète pas les attractions existantes. Réponds uniquement avec les suggestions au format exact (une par ligne): NOM_ATTRACTION;CATEGORIE;PRIX;DESCRIPTION_COURTE. N'utilise pas de formatage markdown comme des astérisques.
 Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
             try {
                 const suggestionsText = await generateContentWithGemini(prompt);
@@ -1116,7 +1524,7 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
                 suggestionsText.split('\n').filter(attr => attr.trim() !== '' && attr.includes(';')).forEach(rawAttrText => {
                     const parts = rawAttrText.split(';');
                     if (parts.length >= 4) { 
-                        const text = parts[0]?.trim();
+                        const text = parts[0]?.trim().replace(/\*\*/g, ''); 
                         const category = parts[1]?.trim() || "Suggestion";
                         const price = parts[2]?.trim() || "N/A";
                         const description = parts[3]?.trim() || "";
@@ -1130,8 +1538,71 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
                 saveData();
             } catch (error) { console.error(`Erreur suggestion pour ${city.name}:`, error); }
         }
+
+        async function suggestFoodForCity(cityId) {
+            const city = citiesData.find(c => c.id === cityId); if (!city) return;
+            const existingFoodText = (city.attractions || []).filter(attr => attr.category === "Nourriture & Restaurants").map(attr => `- ${attr.text}`).join('\n');
+            const prompt = `Pour la ville de ${city.name} au Japon, suggère 2-3 spécialités culinaires locales ou des types de restaurants à essayer. Pour chaque suggestion, donne le nom et une brève description (max 10 mots). Ne répète pas ce qui existe déjà :\n${existingFoodText}\nRéponds uniquement avec les suggestions au format : NOM_SPECIALITE_OU_TYPE_RESTAURANT;DESCRIPTION_COURTE. N'utilise pas de formatage markdown comme des astérisques.`;
+            
+            try {
+                const suggestionsText = await generateContentWithGemini(prompt);
+                if (!city.attractions) city.attractions = [];
+                suggestionsText.split('\n').filter(line => line.trim() !== '' && line.includes(';')).forEach(rawLine => {
+                    const parts = rawLine.split(';');
+                    if (parts.length >= 2) {
+                        const text = parts[0]?.trim().replace(/\*\*/g, ''); 
+                        const description = parts[1]?.trim() || "";
+                        if (text && !city.attractions.some(ea => ea.text.toLowerCase().includes(text.toLowerCase()) && ea.category === "Nourriture & Restaurants")) {
+                            city.attractions.push({
+                                id: generateId('food-ai'),
+                                text,
+                                category: "Nourriture & Restaurants",
+                                price: "Variable", 
+                                description,
+                                completed: false,
+                                isAISuggestion: true
+                            });
+                        }
+                    }
+                });
+                if (!city.isExpanded) city.isExpanded = true;
+                renderCities();
+                saveData();
+            } catch (error) { console.error(`Erreur suggestion nourriture pour ${city.name}:`, error); }
+        }
         
         // --- Itinerary Functions ---
+        function renderItineraryPath() {
+            if (!domElements.itineraryPathContainer) return;
+            domElements.itineraryPathContainer.innerHTML = '';
+            const sortedItinerary = [...itineraryData].sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+
+            if (sortedItinerary.length === 0) {
+                domElements.itineraryPathContainer.innerHTML = '<p style="text-align:center; font-size:14px; color: var(--text-color-tertiary);">Aucune étape dans l\'itinéraire.</p>';
+                return;
+            }
+            
+            sortedItinerary.forEach((stop, index) => {
+                const city = citiesData.find(c => c.id === stop.cityId);
+                if (!city) return;
+
+                const pathItem = document.createElement('span');
+                pathItem.className = 'itinerary-path-item';
+                pathItem.style.backgroundColor = city.color || 'var(--tertiary-bg-color)';
+                pathItem.textContent = city.name;
+                domElements.itineraryPathContainer.appendChild(pathItem);
+
+                if (index < sortedItinerary.length - 1) {
+                    const arrowSpan = document.createElement('span');
+                    arrowSpan.innerHTML = icons.route; 
+                    arrowSpan.style.color = 'var(--text-color-tertiary)';
+                    arrowSpan.style.margin = '0 5px';
+                    domElements.itineraryPathContainer.appendChild(arrowSpan);
+                }
+            });
+        }
+
+
         function populateItineraryCitySelect() {
             if (!domElements.itineraryCitySelect) return;
             const currentSelection = domElements.itineraryCitySelect.value;
@@ -1147,32 +1618,41 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
         
         function parseGeminiCostResponse(responseText) {
             if (!responseText) return 0;
-            const text = responseText.replace(/¥/g, '').replace(/,/g, '').trim(); 
-            const rangeMatch = text.match(/^(\d+)\s*-\s*(\d+)$/); 
+            const cleanedText = responseText.replace(/[¥円￥,]/g, '').trim();
+            const rangeMatch = cleanedText.match(/^(\d+)\s*-\s*(\d+)$/);
             if (rangeMatch) {
                 const num1 = parseInt(rangeMatch[1], 10);
                 const num2 = parseInt(rangeMatch[2], 10);
-                return Math.round((num1 + num2) / 2);
+                if (!isNaN(num1) && !isNaN(num2)) {
+                    return Math.round((num1 + num2) / 2);
+                }
             }
-            const singleNumberMatch = text.match(/^(\d+)$/); 
+            const singleNumberMatch = cleanedText.match(/^(\d+)$/);
             if (singleNumberMatch) {
-                return parseInt(singleNumberMatch[1], 10);
+                const num = parseInt(singleNumberMatch[1], 10);
+                if (!isNaN(num)) return num;
             }
-            const anyNumberMatch = text.match(/\d+/);
+            const anyNumberMatch = cleanedText.match(/\d+/);
             if (anyNumberMatch) {
-                return parseInt(anyNumberMatch[0], 10);
+                 const num = parseInt(anyNumberMatch[0], 10);
+                 if (!isNaN(num)) return num;
             }
+            console.warn("Could not parse cost from Gemini response:", responseText);
             return 0; 
         }
 
-        async function getTrainCostEstimateAI(city1Name, city2Name, elementToUpdate) { // Added elementToUpdate
+
+        async function getTrainCostEstimateAI(city1Name, city2Name, elementToUpdate) { 
             if (city1Name === city2Name) return 0; 
 
             const cacheKey = `trainCost-${[city1Name, city2Name].sort().join('-')}`;
-            const cachedCost = localStorage.getItem(cacheKey);
-            if (cachedCost) {
-                 if (elementToUpdate) elementToUpdate.textContent = `Train depuis ${city1Name}: env. ¥${parseInt(cachedCost, 10).toLocaleString()}`;
-                return parseInt(cachedCost, 10);
+            const cachedItem = localStorage.getItem(cacheKey);
+            if (cachedItem) {
+                const {cost, timestamp} = JSON.parse(cachedItem);
+                if (Date.now() - timestamp < 24 * 60 * 60 * 1000) { 
+                    if (elementToUpdate) elementToUpdate.textContent = `Train depuis ${city1Name}: env. ¥${cost.toLocaleString()}`;
+                    return cost;
+                }
             }
 
             const prompt = `Estime le coût moyen en Yens d'un billet de train pour un adulte entre ${city1Name} et ${city2Name} au Japon. Si c'est un trajet typiquement fait en Shinkansen, base-toi sur cela. Réponds uniquement avec un nombre (par exemple, 14500) ou une fourchette de nombres (par exemple, 12000-15000). N'ajoute aucun texte explicatif.`;
@@ -1183,7 +1663,7 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
                 const cost = parseGeminiCostResponse(responseText);
                 
                 if (cost > 0) {
-                    localStorage.setItem(cacheKey, cost.toString()); 
+                    localStorage.setItem(cacheKey, JSON.stringify({cost, timestamp: Date.now()})); 
                 }
                  if (elementToUpdate) elementToUpdate.textContent = cost > 0 ? `Train depuis ${city1Name}: env. ¥${cost.toLocaleString()}` : `Train depuis ${city1Name}: Coût non estimé`;
                 return cost;
@@ -1196,6 +1676,7 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
         
         async function renderItinerary() { 
             if (!domElements.itineraryTimelineContainer) return;
+            renderItineraryPath(); 
             domElements.itineraryTimelineContainer.innerHTML = '';
             
             const sortedItinerary = [...itineraryData].sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
@@ -1205,7 +1686,7 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
                 return;
             }
 
-            for (let index = 0; index < sortedItinerary.length; index++) { // Use a standard for loop for async/await within
+            for (let index = 0; index < sortedItinerary.length; index++) { 
                 const stop = sortedItinerary[index];
                 const city = citiesData.find(c => c.id === stop.cityId);
                 if (!city) continue; 
@@ -1213,8 +1694,27 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'timeline-item';
 
+                const reorderDiv = document.createElement('div'); 
+                reorderDiv.className = 'reorder-buttons';
+                if (index > 0) { 
+                    const upButton = document.createElement('button');
+                    upButton.innerHTML = icons.arrowUp;
+                    upButton.title = "Monter l'étape";
+                    upButton.addEventListener('click', () => moveItineraryStop(index, index - 1));
+                    reorderDiv.appendChild(upButton);
+                }
+                if (index < sortedItinerary.length - 1) { 
+                     const downButton = document.createElement('button');
+                    downButton.innerHTML = icons.chevronDown; 
+                    downButton.title = "Descendre l'étape";
+                    downButton.addEventListener('click', () => moveItineraryStop(index, index + 1));
+                    reorderDiv.appendChild(downButton);
+                }
+                itemDiv.appendChild(reorderDiv); 
+
                 const dotDiv = document.createElement('div');
                 dotDiv.className = 'timeline-dot';
+                dotDiv.style.backgroundColor = city.color || 'var(--accent-color)'; 
                 itemDiv.appendChild(dotDiv);
 
                 const contentDiv = document.createElement('div');
@@ -1223,6 +1723,7 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
                 const cityP = document.createElement('p');
                 cityP.className = 'timeline-city';
                 cityP.textContent = city.name;
+                cityP.style.color = city.color || 'var(--text-color-primary)'; 
                 contentDiv.appendChild(cityP);
 
                 const startDate = new Date(stop.startDate + 'T00:00:00'); 
@@ -1252,10 +1753,9 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
                     if (prevCity && prevCity.name !== city.name) {
                         const trainCostP = document.createElement('p');
                         trainCostP.className = 'timeline-train-cost';
-                        trainCostP.id = `trainCost-${prevCity.id}-${city.id}-${stop.id}`; // More specific ID
+                        trainCostP.id = `trainCost-${prevCity.id}-${city.id}-${stop.id}`; 
                         trainCostP.textContent = `Train depuis ${prevCity.name}: Estimation...`;
                         contentDiv.appendChild(trainCostP);
-                        // Call AI estimation and update the specific element
                         getTrainCostEstimateAI(prevCity.name, city.name, trainCostP); 
                     }
                 }
@@ -1281,6 +1781,37 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
                 domElements.itineraryTimelineContainer.appendChild(itemDiv);
             }
         }
+
+        function moveItineraryStop(oldIndexSorted, newIndexSorted) {
+            const sortedItinerary = [...itineraryData].sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+            const itemToMoveId = sortedItinerary[oldIndexSorted].id;
+            
+            const itemToMoveOriginalIndex = itineraryData.findIndex(item => item.id === itemToMoveId);
+            if (itemToMoveOriginalIndex === -1) return;
+
+            const item = itineraryData.splice(itemToMoveOriginalIndex, 1)[0]; 
+            
+            let newOriginalIndex = 0;
+            if (newIndexSorted < oldIndexSorted) { 
+                if (newIndexSorted === 0) {
+                    newOriginalIndex = 0;
+                } else {
+                    const itemBeforeTargetId = sortedItinerary[newIndexSorted -1].id;
+                    newOriginalIndex = itineraryData.findIndex(it => it.id === itemBeforeTargetId) + 1;
+                }
+            } else { 
+                 if (newIndexSorted >= itineraryData.length) { 
+                    newOriginalIndex = itineraryData.length;
+                 } else {
+                    const itemAtTargetId = sortedItinerary[newIndexSorted].id; 
+                    newOriginalIndex = itineraryData.findIndex(it => it.id === itemAtTargetId);
+                 }
+            }
+            itineraryData.splice(newOriginalIndex, 0, item); 
+
+            renderItinerary();
+            saveData();
+        }
         
         function populateItineraryFormForEdit(stopId) {
             const stopToEdit = itineraryData.find(stop => stop.id === stopId);
@@ -1301,7 +1832,24 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
             editingItineraryStopId = null;
             domElements.editingItineraryStopIdInput.value = '';
             domElements.itineraryForm.reset();
-            domElements.itineraryStartDateInput.value = TRIP_START_DATE; 
+            
+            const sortedItinerary = [...itineraryData].sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+            let nextStartDateStr = TRIP_START_DATE;
+            if(sortedItinerary.length > 0) {
+                const lastStop = sortedItinerary[sortedItinerary.length -1];
+                const lastStopEndDate = new Date(lastStop.startDate + "T00:00:00");
+                lastStopEndDate.setDate(lastStopEndDate.getDate() + parseInt(lastStop.durationNights));
+                
+                const tripEndDateObj = new Date(TRIP_END_DATE + "T00:00:00");
+                if (lastStopEndDate <= tripEndDateObj) { 
+                    nextStartDateStr = lastStopEndDate.toISOString().split('T')[0];
+                } else {
+                    nextStartDateStr = TRIP_END_DATE; 
+                }
+            }
+            domElements.itineraryStartDateInput.value = nextStartDateStr;
+
+
             domElements.addItineraryStopButton.textContent = 'Ajouter Étape';
             domElements.cancelEditItineraryButton.style.display = 'none';
             populateItineraryCitySelect(); 
@@ -1332,29 +1880,16 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
                  return;
             }
             
-            const otherStops = itineraryData.filter(s => s.id !== editingItineraryStopId);
-            let latestEndDateBeforeNewStop = new Date(tripStartDateObj);
-            latestEndDateBeforeNewStop.setDate(latestEndDateBeforeNewStop.getDate() -1); 
+            const otherStops = itineraryData.filter(s => s.id !== editingItineraryStopId); 
+            for (const stop of otherStops) {
+                const existingStartDate = new Date(stop.startDate + 'T00:00:00');
+                const existingEndDate = new Date(existingStartDate);
+                existingEndDate.setDate(existingStartDate.getDate() + parseInt(stop.durationNights));
 
-            for(const stop of otherStops) { 
-                const stopStartDate = new Date(stop.startDate + 'T00:00:00');
-                const stopEndDate = new Date(stopStartDate);
-                stopEndDate.setDate(stopStartDate.getDate() + parseInt(stop.durationNights));
-                if (stopEndDate <= newStopDate) { 
-                    latestEndDateBeforeNewStop = stopEndDate > latestEndDateBeforeNewStop ? stopEndDate : latestEndDateBeforeNewStop;
+                if (newStopDate < existingEndDate && tempEndDate > existingStartDate) {
+                    showErrorMessage(`Cette période chevauche une étape existante pour ${citiesData.find(c=>c.id === stop.cityId)?.name || 'une ville'} (${existingStartDate.toLocaleDateString('fr-FR')} - ${existingEndDate.toLocaleDateString('fr-FR')}).`);
+                    return;
                 }
-            }
-             if (newStopDate < latestEndDateBeforeNewStop) {
-                 showErrorMessage(`La date de début (${newStopDate.toLocaleDateString('fr-FR')}) chevauche une étape précédente qui se termine le ${latestEndDateBeforeNewStop.toLocaleDateString('fr-FR')}.`);
-                 return;
-             }
-
-            for(const stop of otherStops) {
-                 const stopStartDate = new Date(stop.startDate + 'T00:00:00');
-                 if (tempEndDate > stopStartDate && newStopDate < stopStartDate) { 
-                      showErrorMessage(`Cette étape chevauche une étape existante qui commence le ${stopStartDate.toLocaleDateString('fr-FR')}.`);
-                      return;
-                 }
             }
 
 
@@ -1376,14 +1911,6 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
             renderItinerary();
             saveData();
             resetItineraryForm(); 
-            
-            const suggestedNextStart = new Date(tempEndDate);
-            if (suggestedNextStart <= tripEndDateObj) {
-                 domElements.itineraryStartDateInput.value = suggestedNextStart.toISOString().split('T')[0];
-            } else {
-                 domElements.itineraryStartDateInput.value = TRIP_END_DATE;
-            }
-            domElements.itineraryDurationNightsInput.value = "3"; 
         }
         
         function deleteItineraryStop(stopId) {
@@ -1420,7 +1947,7 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
                 const city1Data = citiesData.find(c => c.id === sortedItinerary[i].cityId);
                 const city2Data = citiesData.find(c => c.id === sortedItinerary[i+1].cityId);
                 if (city1Data && city2Data && city1Data.name !== city2Data.name) { 
-                    costPromises.push(getTrainCostEstimateAI(city1Data.name, city2Data.name, null)); // Pass null for elementToUpdate
+                    costPromises.push(getTrainCostEstimateAI(city1Data.name, city2Data.name, null)); 
                 } else {
                     costPromises.push(Promise.resolve(0)); 
                 }
@@ -1437,12 +1964,17 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
                 return;
             }
 
-
             let resultsHTML = `<p><strong>Coût total estimé des billets individuels :</strong> ¥${totalIndividualCost.toLocaleString()}</p>`;
-            resultsHTML += `<p><strong>Comparaison avec les JR Pass (prix approximatifs) :</strong></p><ul>`;
+            resultsHTML += `<p><strong>Comparaison avec les JR Pass (prix affichés ci-dessus) :</strong></p><ul>`;
 
-            let bestPassOption = null;
-            let maxSavings = -Infinity;
+            let bestPassOption = { days: 0, savings: -Infinity, price: Infinity };
+            
+            const firstDay = new Date(sortedItinerary[0].startDate + "T00:00:00");
+            const lastStop = sortedItinerary[sortedItinerary.length - 1];
+            const lastDayItinerary = new Date(lastStop.startDate + "T00:00:00");
+            lastDayItinerary.setDate(lastDayItinerary.getDate() + parseInt(lastStop.durationNights));
+            const mainTravelDuration = Math.ceil((lastDayItinerary - firstDay) / (1000 * 60 * 60 * 24)) +1; 
+
 
             Object.entries(jrPassPrices).forEach(([days, price]) => {
                 const difference = totalIndividualCost - price;
@@ -1451,19 +1983,39 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
                                 ${isProfitable ? '<strong style="color:var(--highlight-color);">Rentable</strong>' : 'Non rentable'}. 
                                 ${isProfitable ? 'Économie estimée' : 'Surcoût'}: ¥${Math.abs(difference).toLocaleString()}
                                </li>`;
-                if (isProfitable && difference > maxSavings) {
-                    maxSavings = difference;
-                    bestPassOption = days;
+                if (isProfitable && difference > bestPassOption.savings) {
+                    bestPassOption = {days: parseInt(days), savings: difference, price: price};
+                } else if (!isProfitable && price < bestPassOption.price && bestPassOption.savings === -Infinity) {
+                    bestPassOption = {days: parseInt(days), savings: difference, price: price};
                 }
             });
             resultsHTML += `</ul>`;
 
             let recommendationText = "";
-            if (bestPassOption) {
-                recommendationText = `Un JR Pass de ${bestPassOption} jours semble être l'option la plus rentable pour votre itinéraire actuel, avec une économie estimée de ¥${maxSavings.toLocaleString()}.`;
-                resultsHTML += `<p class="recommendation profitable">${recommendationText}</p>`;
-            } else {
-                recommendationText = "D'après cet itinéraire, il est probablement plus économique d'acheter des billets de train individuels.";
+            if (bestPassOption.savings > 0) { 
+                recommendationText = `Un JR Pass de ${bestPassOption.days} jours semble être l'option la plus rentable, économisant environ ¥${bestPassOption.savings.toLocaleString()}.`;
+                if (mainTravelDuration > bestPassOption.days) {
+                    recommendationText += ` Votre période de voyage principale est d'environ ${mainTravelDuration} jours. Concentrez vos trajets les plus chers pendant la validité du pass de ${bestPassOption.days} jours.`;
+                } else if (mainTravelDuration < bestPassOption.days && bestPassOption.days > 7) {
+                    let shorterProfitablePass = null;
+                    Object.entries(jrPassPrices).forEach(([daysStr, price]) => {
+                        const days = parseInt(daysStr);
+                        if (days < bestPassOption.days && (totalIndividualCost - price) > 0) {
+                            if (!shorterProfitablePass || (totalIndividualCost - price) > (totalIndividualCost - jrPassPrices[shorterProfitablePass])) {
+                                shorterProfitablePass = days;
+                            }
+                        }
+                    });
+                    if (shorterProfitablePass && mainTravelDuration <= shorterProfitablePass) {
+                         recommendationText = `Un JR Pass de ${shorterProfitablePass} jours pourrait être suffisant et rentable pour votre voyage de ${mainTravelDuration} jours, économisant environ ¥${(totalIndividualCost - jrPassPrices[shorterProfitablePass]).toLocaleString()}.`;
+                    }
+                }
+                 resultsHTML += `<p class="recommendation profitable">${recommendationText}</p>`;
+            } else { 
+                recommendationText = "D'après cet itinéraire, acheter des billets individuels semble plus économique.";
+                if (totalIndividualCost > 0 && bestPassOption.price !== Infinity) { 
+                     recommendationText += ` Le pass le moins cher (${bestPassOption.days} jours à ¥${bestPassOption.price.toLocaleString()}) entraînerait un surcoût d'environ ¥${Math.abs(bestPassOption.savings).toLocaleString()}.`;
+                }
                 resultsHTML += `<p class="recommendation not-profitable">${recommendationText}</p>`;
             }
             
@@ -1488,12 +2040,9 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
         function loadVoices() {
             const voices = speechSynthesis.getVoices();
             japaneseVoice = voices.find(voice => voice.lang === 'ja-JP');
-            if (!japaneseVoice && voices.length > 0) { // Fallback if specific ja-JP not found but others exist
+            if (!japaneseVoice && voices.length > 0) { 
                 japaneseVoice = voices.find(voice => voice.lang.startsWith('ja'));
             }
-            // console.log("Voix japonaises disponibles:", voices.filter(v => v.lang.startsWith('ja')));
-            // if (japaneseVoice) console.log("Voix japonaise sélectionnée:", japaneseVoice.name);
-            // else console.warn("Aucune voix japonaise trouvée après chargement.");
         }
 
 
@@ -1503,7 +2052,7 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
                 return;
             }
             
-            window.speechSynthesis.cancel(); // Cancel any ongoing speech
+            window.speechSynthesis.cancel(); 
 
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = lang;
@@ -1512,24 +2061,20 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
             if (japaneseVoice) {
                 utterance.voice = japaneseVoice;
             } else {
-                // Try to find a voice on the fly if not preloaded (less reliable)
-                const voices = speechSynthesis.getVoices();
-                const specificVoice = voices.find(voice => voice.lang === lang);
-                if (specificVoice) {
-                    utterance.voice = specificVoice;
+                const voices = speechSynthesis.getVoices(); 
+                let voiceToUse = voices.find(voice => voice.lang === lang);
+                if (!voiceToUse) voiceToUse = voices.find(voice => voice.lang.startsWith('ja'));
+
+                if (voiceToUse) {
+                    utterance.voice = voiceToUse;
                 } else {
-                    const genericJapaneseVoice = voices.find(voice => voice.lang.startsWith('ja'));
-                    if (genericJapaneseVoice) {
-                        utterance.voice = genericJapaneseVoice;
-                    } else if (voices.length > 0) {
-                        // console.warn(`Voix pour ${lang} non trouvée, utilisation de la première voix disponible: ${voices[0].name}`);
-                        // utterance.voice = voices[0]; // Fallback to any voice - might not be ideal
-                    } else {
-                         console.warn("Aucune voix de synthèse disponible sur cet appareil.");
-                         showErrorMessage("Aucune voix de synthèse disponible sur cet appareil.");
-                         return;
-                    }
+                    console.warn(`Aucune voix japonaise (ja-JP ou ja*) trouvée. La voix par défaut du système sera utilisée si possible.`);
                 }
+                 if (voices.length === 0 && !japaneseVoice) {
+                     console.warn("Aucune voix de synthèse disponible sur cet appareil lors de la tentative de parole.");
+                     showErrorMessage("Aucune voix de synthèse n'est actuellement disponible sur cet appareil.");
+                     return;
+                 }
             }
             
             utterance.onerror = (event) => {
@@ -1578,16 +2123,15 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
             const prompt = `Je planifie un voyage au Japon. Voici des mots/phrases que je connais déjà :\n${existingWordsText}\n\nSuggère 3-5 autres mots ou courtes phrases japonaises utiles pour un touriste. Pour chaque suggestion:
 1. Le terme en français.
 2. Sa traduction STRICTEMENT en caractères japonais (Hiragana, Katakana, Kanji uniquement - pas de romaji, pas de notes explicatives dans la traduction).
-Sépare le français et le japonais par un DEUX-POINTS. Ne répète pas les mots existants.
-Format exact: TERME_FRANCAIS: TRADUCTION_JAPONAISE_PURE
+Sépare le français et le japonais par un DEUX-POINTS. Ne répète pas les mots existants. Réponds uniquement avec les suggestions au format exact: TERME_FRANCAIS: TRADUCTION_JAPONAISE_PURE. N'utilise pas de formatage markdown comme des astérisques.
 Exemple: Où sont les toilettes ?: トイレはどこですか`;
             try {
                 const suggestionsText = await generateContentWithGemini(prompt);
                 suggestionsText.split('\n').filter(line => line.trim() !== '' && line.includes(':')).forEach(rawLine => {
                     const parts = rawLine.split(':');
                     if (parts.length >= 2) {
-                        const textFr = parts[0].trim();
-                        const translationJp = parts.slice(1).join(':').trim();
+                        const textFr = parts[0].trim().replace(/\*\*/g, '');
+                        const translationJp = parts.slice(1).join(':').trim().replace(/\*\*/g, '');
                         if (textFr && translationJp && !usefulWords.some(w => w.text.toLowerCase() === textFr.toLowerCase() || w.translation.toLowerCase() === translationJp.toLowerCase())) {
                             usefulWords.push({ id: generateId('word-ai'), text: textFr, translation: translationJp, isAISuggestion: true, lang: 'ja-JP' });
                         }
@@ -1597,6 +2141,17 @@ Exemple: Où sont les toilettes ?: トイレはどこですか`;
             } catch (error) { console.error("Erreur suggestion mots:", error); }
         }
         if(domElements.suggestWordsButton) domElements.suggestWordsButton.addEventListener('click', suggestNewWords);
+
+        function applyTheme(themeName) {
+            domElements.body.className = ''; 
+            if (themeName === 'light') {
+                domElements.body.classList.add('theme-light');
+            } else {
+                domElements.body.classList.add('theme-dark'); 
+            }
+            localStorage.setItem('japanTripTheme', themeName);
+        }
+
 
         function initIcons() {
             if(domElements.tabIconChecklist) domElements.tabIconChecklist.innerHTML = icons.checklist;
@@ -1608,13 +2163,17 @@ Exemple: Où sont les toilettes ?: トイレはどこですか`;
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Attempt to load voices early and on change
             if ('speechSynthesis' in window) {
                 speechSynthesis.onvoiceschanged = loadVoices;
-                loadVoices(); // Initial attempt
+                loadVoices(); 
             }
 
             loadData(); 
+            const savedTheme = localStorage.getItem('japanTripTheme') || 'dark';
+            applyTheme(savedTheme);
+            if (domElements.themeSelect) domElements.themeSelect.value = savedTheme;
+
+
             initIcons(); 
             setActiveScreen('checklistScreen'); 
             
@@ -1627,15 +2186,24 @@ Exemple: Où sont les toilettes ?: トイレはどこですか`;
             if(domElements.itineraryStartDateInput) {
                 domElements.itineraryStartDateInput.min = TRIP_START_DATE;
                 domElements.itineraryStartDateInput.max = TRIP_END_DATE;
-                domElements.itineraryStartDateInput.value = TRIP_START_DATE;
             }
             if(domElements.calculateJrPassButton) { 
                  domElements.calculateJrPassButton.addEventListener('click', calculateAndDisplayJrPassProfitability);
             }
+            if(domElements.themeSelect) {
+                domElements.themeSelect.addEventListener('change', (e) => applyTheme(e.target.value));
+            }
+            if (domElements.closeCityModalButton) domElements.closeCityModalButton.onclick = closeEditCityModal;
+            if (domElements.saveCityModalButton) domElements.saveCityModalButton.onclick = saveCityDetails;
+            window.onclick = function(event) { 
+                if (event.target == domElements.editCityModal) {
+                    closeEditCityModal();
+                }
+            }
+            resetItineraryForm(); 
 
             updateConversionRateText();
         });
     </script>
 </body>
 </html>
-
