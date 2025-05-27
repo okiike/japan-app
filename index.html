@@ -610,9 +610,10 @@
         let citiesData = [];
         let usefulWords = [];
         let itineraryData = [];
-        let editingItineraryStopId = null; // To track if we are editing an itinerary stop
+        let editingItineraryStopId = null; 
+        let japaneseVoice = null; // For TTS
         
-        const jrPassPrices = { // Prix approximatifs en Yens
+        const jrPassPrices = { 
             7: 50000,
             14: 80000,
             21: 100000
@@ -1164,40 +1165,36 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
             return 0; 
         }
 
-        async function getTrainCostEstimateAI(city1Name, city2Name) {
+        async function getTrainCostEstimateAI(city1Name, city2Name, elementToUpdate) { // Added elementToUpdate
             if (city1Name === city2Name) return 0; 
 
             const cacheKey = `trainCost-${[city1Name, city2Name].sort().join('-')}`;
             const cachedCost = localStorage.getItem(cacheKey);
             if (cachedCost) {
+                 if (elementToUpdate) elementToUpdate.textContent = `Train depuis ${city1Name}: env. ¥${parseInt(cachedCost, 10).toLocaleString()}`;
                 return parseInt(cachedCost, 10);
             }
 
             const prompt = `Estime le coût moyen en Yens d'un billet de train pour un adulte entre ${city1Name} et ${city2Name} au Japon. Si c'est un trajet typiquement fait en Shinkansen, base-toi sur cela. Réponds uniquement avec un nombre (par exemple, 14500) ou une fourchette de nombres (par exemple, 12000-15000). N'ajoute aucun texte explicatif.`;
             try {
-                // Temporarily show a generic loading message for this specific AI call
-                // This avoids multiple global loading messages if called in a loop.
-                const tempLoadingMessage = document.getElementById(`trainCost-${city1Name}-${city2Name}`);
-                if (tempLoadingMessage) tempLoadingMessage.textContent = 'Estimation...';
+                if (elementToUpdate) elementToUpdate.textContent = `Train depuis ${city1Name}: Estimation...`;
                 
                 const responseText = await generateContentWithGemini(prompt); 
                 const cost = parseGeminiCostResponse(responseText);
                 
                 if (cost > 0) {
-                    localStorage.setItem(cacheKey, cost.toString()); // Cache the result
+                    localStorage.setItem(cacheKey, cost.toString()); 
                 }
-                 if (tempLoadingMessage) tempLoadingMessage.textContent = cost > 0 ? `env. ¥${cost.toLocaleString()}` : 'Coût non estimé';
+                 if (elementToUpdate) elementToUpdate.textContent = cost > 0 ? `Train depuis ${city1Name}: env. ¥${cost.toLocaleString()}` : `Train depuis ${city1Name}: Coût non estimé`;
                 return cost;
             } catch (error) {
                 console.error(`Erreur d'estimation du coût du train pour ${city1Name} - ${city2Name}:`, error);
-                // Don't show global error message here, as generateContentWithGemini already does.
-                const tempLoadingMessage = document.getElementById(`trainCost-${city1Name}-${city2Name}`);
-                if (tempLoadingMessage) tempLoadingMessage.textContent = 'Erreur estim.';
+                if (elementToUpdate) elementToUpdate.textContent = `Train depuis ${city1Name}: Erreur estim.`;
                 return 0; 
             }
         }
         
-        async function renderItinerary() { // Made async
+        async function renderItinerary() { 
             if (!domElements.itineraryTimelineContainer) return;
             domElements.itineraryTimelineContainer.innerHTML = '';
             
@@ -1208,10 +1205,7 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
                 return;
             }
 
-            // Prepare to fetch all costs
-            const trainCostElements = []; // To update after fetching
-
-            for (let index = 0; index < sortedItinerary.length; index++) {
+            for (let index = 0; index < sortedItinerary.length; index++) { // Use a standard for loop for async/await within
                 const stop = sortedItinerary[index];
                 const city = citiesData.find(c => c.id === stop.cityId);
                 if (!city) continue; 
@@ -1258,10 +1252,11 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
                     if (prevCity && prevCity.name !== city.name) {
                         const trainCostP = document.createElement('p');
                         trainCostP.className = 'timeline-train-cost';
-                        trainCostP.id = `trainCost-${prevCity.name}-${city.name}-${index}`; // Unique ID for update
+                        trainCostP.id = `trainCost-${prevCity.id}-${city.id}-${stop.id}`; // More specific ID
                         trainCostP.textContent = `Train depuis ${prevCity.name}: Estimation...`;
                         contentDiv.appendChild(trainCostP);
-                        trainCostElements.push({element: trainCostP, city1: prevCity.name, city2: city.name });
+                        // Call AI estimation and update the specific element
+                        getTrainCostEstimateAI(prevCity.name, city.name, trainCostP); 
                     }
                 }
                 
@@ -1284,19 +1279,6 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
 
                 itemDiv.appendChild(contentDiv);
                 domElements.itineraryTimelineContainer.appendChild(itemDiv);
-            }
-
-            // After all initial elements are on the page, fetch and update costs
-            for (const item of trainCostElements) {
-                getTrainCostEstimateAI(item.city1, item.city2).then(cost => {
-                    if (cost > 0) {
-                        item.element.textContent = `Train depuis ${item.city1}: env. ¥${cost.toLocaleString()}`;
-                    } else {
-                        item.element.textContent = `Train depuis ${item.city1}: Coût non estimé`;
-                    }
-                }).catch(() => {
-                     item.element.textContent = `Train depuis ${item.city1}: Erreur estim.`;
-                });
             }
         }
         
@@ -1354,7 +1336,7 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
             let latestEndDateBeforeNewStop = new Date(tripStartDateObj);
             latestEndDateBeforeNewStop.setDate(latestEndDateBeforeNewStop.getDate() -1); 
 
-            for(const stop of otherStops) { // Check against other stops only
+            for(const stop of otherStops) { 
                 const stopStartDate = new Date(stop.startDate + 'T00:00:00');
                 const stopEndDate = new Date(stopStartDate);
                 stopEndDate.setDate(stopStartDate.getDate() + parseInt(stop.durationNights));
@@ -1419,7 +1401,7 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
         }
         
         // --- JR Pass Calculator ---
-        async function calculateAndDisplayJrPassProfitability() { // Made async
+        async function calculateAndDisplayJrPassProfitability() { 
             if (!domElements.jrPassResultContainer) return;
 
             const sortedItinerary = [...itineraryData].sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
@@ -1429,7 +1411,7 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
                 return;
             }
             
-            showLoadingMessage("Calcul des coûts de train..."); // Show loading message
+            showLoadingMessage("Calcul des coûts de train..."); 
 
             let totalIndividualCost = 0;
             const costPromises = [];
@@ -1438,16 +1420,16 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
                 const city1Data = citiesData.find(c => c.id === sortedItinerary[i].cityId);
                 const city2Data = citiesData.find(c => c.id === sortedItinerary[i+1].cityId);
                 if (city1Data && city2Data && city1Data.name !== city2Data.name) { 
-                    costPromises.push(getTrainCostEstimateAI(city1Data.name, city2Data.name));
+                    costPromises.push(getTrainCostEstimateAI(city1Data.name, city2Data.name, null)); // Pass null for elementToUpdate
                 } else {
-                    costPromises.push(Promise.resolve(0)); // No cost if same city or data missing
+                    costPromises.push(Promise.resolve(0)); 
                 }
             }
             
             try {
                 const individualCosts = await Promise.all(costPromises);
                 totalIndividualCost = individualCosts.reduce((sum, cost) => sum + cost, 0);
-                hideLoadingMessage(); // Hide after all costs are fetched
+                hideLoadingMessage(); 
             } catch (error) {
                 hideLoadingMessage();
                 showErrorMessage("Erreur lors de l'estimation des coûts de train.");
@@ -1503,14 +1485,79 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
         if(domElements.eurInput) domElements.eurInput.addEventListener('input', convertCurrency);
         if(domElements.jpyInput) domElements.jpyInput.addEventListener('input', convertCurrency);
 
-        function speak(text, lang = 'ja-JP') {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel(); 
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = lang; utterance.rate = 0.9; 
-                window.speechSynthesis.speak(utterance);
-            } else { showErrorMessage("La synthèse vocale n'est pas supportée."); }
+        function loadVoices() {
+            const voices = speechSynthesis.getVoices();
+            japaneseVoice = voices.find(voice => voice.lang === 'ja-JP');
+            if (!japaneseVoice && voices.length > 0) { // Fallback if specific ja-JP not found but others exist
+                japaneseVoice = voices.find(voice => voice.lang.startsWith('ja'));
+            }
+            // console.log("Voix japonaises disponibles:", voices.filter(v => v.lang.startsWith('ja')));
+            // if (japaneseVoice) console.log("Voix japonaise sélectionnée:", japaneseVoice.name);
+            // else console.warn("Aucune voix japonaise trouvée après chargement.");
         }
+
+
+        function speak(text, lang = 'ja-JP') {
+            if (!('speechSynthesis' in window)) {
+                showErrorMessage("La synthèse vocale n'est pas supportée par votre navigateur.");
+                return;
+            }
+            
+            window.speechSynthesis.cancel(); // Cancel any ongoing speech
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = lang;
+            utterance.rate = 0.9;
+
+            if (japaneseVoice) {
+                utterance.voice = japaneseVoice;
+            } else {
+                // Try to find a voice on the fly if not preloaded (less reliable)
+                const voices = speechSynthesis.getVoices();
+                const specificVoice = voices.find(voice => voice.lang === lang);
+                if (specificVoice) {
+                    utterance.voice = specificVoice;
+                } else {
+                    const genericJapaneseVoice = voices.find(voice => voice.lang.startsWith('ja'));
+                    if (genericJapaneseVoice) {
+                        utterance.voice = genericJapaneseVoice;
+                    } else if (voices.length > 0) {
+                        // console.warn(`Voix pour ${lang} non trouvée, utilisation de la première voix disponible: ${voices[0].name}`);
+                        // utterance.voice = voices[0]; // Fallback to any voice - might not be ideal
+                    } else {
+                         console.warn("Aucune voix de synthèse disponible sur cet appareil.");
+                         showErrorMessage("Aucune voix de synthèse disponible sur cet appareil.");
+                         return;
+                    }
+                }
+            }
+            
+            utterance.onerror = (event) => {
+                console.error('Erreur de synthèse vocale:', event.error);
+                let errorMessage = "Erreur de synthèse vocale.";
+                if (event.error === 'no-speech') {
+                    errorMessage = "Aucun son n'a pu être produit (no-speech).";
+                } else if (event.error === 'audio-busy') {
+                    errorMessage = "Le service audio est occupé (audio-busy).";
+                } else if (event.error === 'audio-hardware') {
+                    errorMessage = "Problème matériel audio (audio-hardware).";
+                } else if (event.error === 'network') {
+                    errorMessage = "Erreur réseau pour la synthèse vocale.";
+                } else if (event.error === 'synthesis-unavailable') {
+                    errorMessage = "Service de synthèse non disponible.";
+                } else if (event.error === 'synthesis-failed') {
+                    errorMessage = "La synthèse vocale a échoué.";
+                } else if (event.error === 'language-unavailable') {
+                    errorMessage = `La langue ${lang} n'est pas supportée pour la synthèse vocale.`;
+                } else if (event.error === 'voice-unavailable') {
+                    errorMessage = `La voix sélectionnée pour ${lang} n'est pas disponible.`;
+                }
+                showErrorMessage(errorMessage);
+            };
+            
+            window.speechSynthesis.speak(utterance);
+        }
+
         function renderUsefulWords() { 
             if (!domElements.usefulWordsListDiv) return;
             domElements.usefulWordsListDiv.innerHTML = ''; 
@@ -1561,6 +1608,12 @@ Exemple: Où sont les toilettes ?: トイレはどこですか`;
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            // Attempt to load voices early and on change
+            if ('speechSynthesis' in window) {
+                speechSynthesis.onvoiceschanged = loadVoices;
+                loadVoices(); // Initial attempt
+            }
+
             loadData(); 
             initIcons(); 
             setActiveScreen('checklistScreen'); 
@@ -1585,3 +1638,4 @@ Exemple: Où sont les toilettes ?: トイレはどこですか`;
     </script>
 </body>
 </html>
+
