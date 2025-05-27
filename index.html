@@ -146,6 +146,8 @@
         .button:hover { filter: brightness(1.15); }
         .ai-button { margin-bottom: 20px; }
         .small-button { padding: 8px 12px; font-size: 14px; }
+        .secondary-button { background-color: var(--tertiary-bg-color); }
+
 
         .scroll-container { 
             overflow-y: auto; background-color: var(--secondary-bg-color); 
@@ -154,7 +156,7 @@
         .checklist-scroll-container { max-height: calc(100vh - 350px); } 
         .cities-scroll-container { max-height: calc(100vh - 270px); }
         .info-scroll-container { max-height: calc(100vh - 180px); }
-        .itinerary-scroll-container { max-height: calc(100vh - 250px); }
+        .itinerary-scroll-container { max-height: calc(100vh - 320px); } /* Adjusted for form */
 
 
         .list-item { 
@@ -370,6 +372,10 @@
             border-radius: 10px;
             margin-bottom: 20px;
         }
+        .itinerary-form-buttons {
+            display: flex;
+            gap: 10px; /* Space between buttons */
+        }
         .timeline {
             position: relative;
             padding: 20px 0;
@@ -478,7 +484,7 @@
         <div id="itineraryScreen" class="screen">
             <h1 class="screen-title">Mon itinéraire (15 Nov - 29 Nov 2025)</h1>
             <form id="itineraryForm">
-                <div class="form-group">
+                <input type="hidden" id="editingItineraryStopId"> <div class="form-group">
                     <label for="itineraryCitySelect">Ville :</label>
                     <select id="itineraryCitySelect" class="select-input"></select>
                 </div>
@@ -494,7 +500,10 @@
                     <label for="itineraryNotes">Notes (optionnel) :</label>
                     <textarea id="itineraryNotes" class="textarea-input" placeholder="Ex: Réservation hôtel XYZ, vol à 14h..."></textarea>
                 </div>
-                <button type="submit" id="addItineraryStopButton" class="button add-button">Ajouter Étape</button>
+                <div class="itinerary-form-buttons">
+                    <button type="submit" id="addItineraryStopButton" class="button add-button">Ajouter Étape</button>
+                    <button type="button" id="cancelEditItineraryButton" class="button secondary-button" style="display:none;">Annuler Modification</button>
+                </div>
             </form>
             <div id="itineraryTimelineContainer" class="itinerary-scroll-container timeline">
                 </div>
@@ -587,7 +596,8 @@
             chevronDown: '<svg class="svg-icon small" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6l-6-6l1.41-1.41z"/></svg>',
             chevronUp: '<svg class="svg-icon small" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6l-6 6l1.41 1.41z"/></svg>',
             mapMarker: '<svg class="svg-icon small" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>',
-            calendar: '<svg class="svg-icon small" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>'
+            calendar: '<svg class="svg-icon small" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>',
+            edit: '<svg class="svg-icon small" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>'
         };
 
         const LOCAL_STORAGE_KEY = 'japanTripPlannerData_v3';
@@ -600,6 +610,7 @@
         let citiesData = [];
         let usefulWords = [];
         let itineraryData = [];
+        let editingItineraryStopId = null; // To track if we are editing an itinerary stop
         
         const jrPassPrices = { // Prix approximatifs en Yens
             7: 50000,
@@ -631,10 +642,13 @@
             tabIconItinerary: document.getElementById('tabIconItinerary'),
             tabIconInfo: document.getElementById('tabIconInfo'),
             itineraryForm: document.getElementById('itineraryForm'),
+            editingItineraryStopIdInput: document.getElementById('editingItineraryStopId'),
             itineraryCitySelect: document.getElementById('itineraryCitySelect'),
             itineraryStartDateInput: document.getElementById('itineraryStartDate'),
             itineraryDurationNightsInput: document.getElementById('itineraryDurationNights'),
             itineraryNotesInput: document.getElementById('itineraryNotes'),
+            addItineraryStopButton: document.getElementById('addItineraryStopButton'),
+            cancelEditItineraryButton: document.getElementById('cancelEditItineraryButton'),
             itineraryTimelineContainer: document.getElementById('itineraryTimelineContainer'),
             calculateJrPassButton: document.getElementById('calculateJrPassButton'),
             jrPassResultContainer: document.getElementById('jrPassResultContainer')
@@ -750,8 +764,9 @@
             if (screenId === 'itineraryScreen') {
                 populateItineraryCitySelect();
                 renderItinerary();
+                resetItineraryForm(); // Ensure form is in "add" mode when switching to this tab
             }
-             if (screenId === 'infoScreen' && domElements.calculateJrPassButton) { // Ensure button exists
+             if (screenId === 'infoScreen' && domElements.calculateJrPassButton) { 
                 domElements.calculateJrPassButton.addEventListener('click', calculateAndDisplayJrPassProfitability);
             }
         }
@@ -962,7 +977,7 @@
                             mapButton.addEventListener('click', (e) => {
                                 e.stopPropagation();
                                 const query = encodeURIComponent(`${attraction.text}, ${city.name}, Japon`);
-                                window.open(`https://maps.google.com/?q=${query}`, '_blank'); // Corrected Google Maps URL
+                                window.open(`https://maps.google.com/?q=${query}`, '_blank'); 
                             });
                             contentDiv.appendChild(mapButton);
                             
@@ -1129,34 +1144,40 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
             });
         }
         
-        function parseCostString(costStr) { // Helper to get average cost from string
+        function parseCostString(costStr) { 
             if (!costStr || typeof costStr !== 'string' || costStr.toLowerCase() === "n/a") return 0;
-            const numbers = costStr.match(/\d[\d,]*\d?/g); // Find numbers, handling commas
+            const numbers = costStr.match(/\d[\d,]*\d?/g); 
             if (!numbers) return 0;
             
             const cleanedNumbers = numbers.map(n => parseInt(n.replace(/,/g, ''), 10));
             if (cleanedNumbers.length === 0) return 0;
             if (cleanedNumbers.length === 1) return cleanedNumbers[0];
-            return Math.round((cleanedNumbers[0] + cleanedNumbers[1]) / 2); // Average if range
+            return Math.round((cleanedNumbers[0] + cleanedNumbers[1]) / 2); 
         }
 
 
         function getTrainCostEstimate(city1Name, city2Name) {
-            const costs = { // Returns average numerical cost
-                "Tokyo-Kyoto": parseCostString("¥13,000 - ¥15,000"),
-                "Kyoto-Osaka": parseCostString("¥500 - ¥1,500"),
-                "Tokyo-Osaka": parseCostString("¥14,000 - ¥16,000"),
-                "Kyoto-Hiroshima": parseCostString("¥10,000 - ¥12,000"),
-                "Tokyo-Hakone": parseCostString("¥2,000 - ¥4,000"),
-                "Osaka-Hiroshima": parseCostString("¥9,000 - ¥11,000"),
-                "Tokyo-Nikko": parseCostString("¥2,500 - ¥4,500"),
-                "Kyoto-Nara": parseCostString("¥700 - ¥1,000"),
-                "Osaka-Nara": parseCostString("¥500 - ¥800"),
-                "Hakone-Kyoto": parseCostString("¥12,000 - ¥14,000"), // Via Odawara/Mishima
+            const costs = { 
+                "Tokyo-Kyoto": 14000, // Average of 13k-15k
+                "Kyoto-Osaka": 1000,   // Average of 0.5k-1.5k
+                "Tokyo-Osaka": 15000,  // Average of 14k-16k
+                "Kyoto-Hiroshima": 11000,
+                "Tokyo-Hakone": 3000,
+                "Osaka-Hiroshima": 10000,
+                "Tokyo-Nikko": 3500,
+                "Kyoto-Nara": 850,
+                "Osaka-Nara": 650,
+                "Hakone-Kyoto": 13000,
+                "Hiroshima-Fukuoka": 9000, // Added more routes
+                "Tokyo-Kanazawa": 14000,
+                "Kyoto-Kanazawa": 7000,
+                "Osaka-Kanazawa": 7500,
+                "Tokyo-Sapporo": 25000, // Includes flight or very long train
+                "Osaka-Kobe": 500,
+                "Kyoto-Kobe": 700
             };
-            const key1 = `${city1Name}-${city2Name}`;
-            const key2 = `${city2Name}-${city1Name}`;
-            return costs[key1] || costs[key2] || 0; // Return 0 if not found
+            const key1 = [city1Name, city2Name].sort().join('-'); // Sorted key
+            return costs[key1] || 0; 
         }
         
         function renderItinerary() {
@@ -1220,12 +1241,24 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
                             trainP.className = 'timeline-train-cost';
                             trainP.textContent = `Train depuis ${prevCity.name}: env. ¥${trainCost.toLocaleString()}`;
                             contentDiv.appendChild(trainP);
+                        } else if (prevCity.name !== city.name) { // Only show if different cities and cost is 0 (unknown)
+                             const trainP = document.createElement('p');
+                            trainP.className = 'timeline-train-cost';
+                            trainP.textContent = `Train depuis ${prevCity.name}: Coût non estimé`;
+                            contentDiv.appendChild(trainP);
                         }
                     }
                 }
                 
                 const actionsDiv = document.createElement('div');
                 actionsDiv.className = 'timeline-item-actions';
+                
+                const editStopBtn = document.createElement('button');
+                editStopBtn.className = 'button small-button secondary-button';
+                editStopBtn.innerHTML = icons.edit + " Modifier";
+                editStopBtn.addEventListener('click', () => populateItineraryFormForEdit(stop.id));
+                actionsDiv.appendChild(editStopBtn);
+
                 const deleteStopBtn = document.createElement('button');
                 deleteStopBtn.className = 'button small-button destructive-color'; 
                 deleteStopBtn.style.backgroundColor = 'var(--destructive-color)';
@@ -1239,8 +1272,34 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
                 domElements.itineraryTimelineContainer.appendChild(itemDiv);
             });
         }
+        
+        function populateItineraryFormForEdit(stopId) {
+            const stopToEdit = itineraryData.find(stop => stop.id === stopId);
+            if (!stopToEdit) return;
 
-        function addItineraryStop(event) {
+            editingItineraryStopId = stopId;
+            domElements.editingItineraryStopIdInput.value = stopId;
+            domElements.itineraryCitySelect.value = stopToEdit.cityId;
+            domElements.itineraryStartDateInput.value = stopToEdit.startDate;
+            domElements.itineraryDurationNightsInput.value = stopToEdit.durationNights;
+            domElements.itineraryNotesInput.value = stopToEdit.notes || '';
+            
+            domElements.addItineraryStopButton.textContent = 'Modifier Étape';
+            domElements.cancelEditItineraryButton.style.display = 'inline-flex';
+        }
+
+        function resetItineraryForm() {
+            editingItineraryStopId = null;
+            domElements.editingItineraryStopIdInput.value = '';
+            domElements.itineraryForm.reset();
+            domElements.itineraryStartDateInput.value = TRIP_START_DATE; // Reset to default start
+            domElements.addItineraryStopButton.textContent = 'Ajouter Étape';
+            domElements.cancelEditItineraryButton.style.display = 'none';
+            populateItineraryCitySelect(); // Ensure dropdown is reset
+        }
+
+
+        function handleItineraryFormSubmit(event) {
             event.preventDefault();
             const cityId = domElements.itineraryCitySelect.value;
             const startDateStr = domElements.itineraryStartDateInput.value;
@@ -1264,32 +1323,59 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
                  return;
             }
             
+            // Simplified overlap check for editing:
+            // When editing, we allow the current stop's dates, but check against OTHERS.
+            const otherStops = itineraryData.filter(s => s.id !== editingItineraryStopId);
             let nextAvailableDate = new Date(tripStartDateObj);
-            const sortedItinerary = [...itineraryData].sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
-            if (sortedItinerary.length > 0) {
-                const lastStop = sortedItinerary[sortedItinerary.length - 1];
-                const lastStopEndDate = new Date(lastStop.startDate + 'T00:00:00');
-                lastStopEndDate.setDate(lastStopEndDate.getDate() + parseInt(lastStop.durationNights));
-                nextAvailableDate = lastStopEndDate;
-            }
+            const sortedOtherStops = [...otherStops].sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+            
+            // Find the latest end date of stops *before* the current newStopDate
+            let latestEndDateBeforeNewStop = new Date(tripStartDateObj);
+            latestEndDateBeforeNewStop.setDate(latestEndDateBeforeNewStop.getDate() -1); // to allow starting on trip start date
 
-            if (newStopDate < new Date(nextAvailableDate.toDateString())) { 
-                 showErrorMessage(`La date de début (${newStopDate.toLocaleDateString('fr-FR')}) doit être après ou égale à la fin de l'étape précédente (${nextAvailableDate.toLocaleDateString('fr-FR')}).`);
+            for(const stop of sortedOtherStops) {
+                const stopStartDate = new Date(stop.startDate + 'T00:00:00');
+                const stopEndDate = new Date(stopStartDate);
+                stopEndDate.setDate(stopStartDate.getDate() + parseInt(stop.durationNights));
+                if (stopEndDate <= newStopDate) { // if this stop ends before or on the day our new/edited stop begins
+                    latestEndDateBeforeNewStop = stopEndDate > latestEndDateBeforeNewStop ? stopEndDate : latestEndDateBeforeNewStop;
+                }
+            }
+             if (newStopDate < latestEndDateBeforeNewStop) {
+                 showErrorMessage(`La date de début (${newStopDate.toLocaleDateString('fr-FR')}) chevauche une étape précédente qui se termine le ${latestEndDateBeforeNewStop.toLocaleDateString('fr-FR')}.`);
                  return;
+             }
+
+            // Check if the new/edited stop overlaps with any stop *after* it
+            for(const stop of sortedOtherStops) {
+                 const stopStartDate = new Date(stop.startDate + 'T00:00:00');
+                 if (tempEndDate > stopStartDate && newStopDate < stopStartDate) { // If our stop ends after another begins, and starts before it
+                      showErrorMessage(`Cette étape chevauche une étape existante qui commence le ${stopStartDate.toLocaleDateString('fr-FR')}.`);
+                      return;
+                 }
             }
 
 
-            itineraryData.push({
-                id: generateId('itinerary'),
-                cityId,
-                startDate: startDateStr, 
-                durationNights,
-                notes
-            });
+            if (editingItineraryStopId) { // Update existing stop
+                const stopIndex = itineraryData.findIndex(stop => stop.id === editingItineraryStopId);
+                if (stopIndex > -1) {
+                    itineraryData[stopIndex] = { ...itineraryData[stopIndex], cityId, startDate: startDateStr, durationNights, notes };
+                }
+            } else { // Add new stop
+                itineraryData.push({
+                    id: generateId('itinerary'),
+                    cityId,
+                    startDate: startDateStr, 
+                    durationNights,
+                    notes
+                });
+            }
+            
             renderItinerary();
             saveData();
-            domElements.itineraryForm.reset(); 
+            resetItineraryForm(); // Reset form and editing state
             
+            // Suggest next start date based on the newly added/edited stop
             const suggestedNextStart = new Date(tempEndDate);
             if (suggestedNextStart <= tripEndDateObj) {
                  domElements.itineraryStartDateInput.value = suggestedNextStart.toISOString().split('T')[0];
@@ -1297,7 +1383,6 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
                  domElements.itineraryStartDateInput.value = TRIP_END_DATE;
             }
             domElements.itineraryDurationNightsInput.value = "3"; 
-            populateItineraryCitySelect(); 
         }
         
         function deleteItineraryStop(stopId) {
@@ -1308,7 +1393,10 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
 
 
         if (domElements.itineraryForm) {
-            domElements.itineraryForm.addEventListener('submit', addItineraryStop);
+            domElements.itineraryForm.addEventListener('submit', handleItineraryFormSubmit);
+        }
+        if (domElements.cancelEditItineraryButton) {
+            domElements.cancelEditItineraryButton.addEventListener('click', resetItineraryForm);
         }
         
         // --- JR Pass Calculator ---
@@ -1326,7 +1414,7 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
             for (let i = 0; i < sortedItinerary.length - 1; i++) {
                 const city1 = citiesData.find(c => c.id === sortedItinerary[i].cityId);
                 const city2 = citiesData.find(c => c.id === sortedItinerary[i+1].cityId);
-                if (city1 && city2) {
+                if (city1 && city2 && city1.name !== city2.name) { // Only add cost if cities are different
                     totalIndividualCost += getTrainCostEstimate(city1.name, city2.name);
                 }
             }
@@ -1451,7 +1539,7 @@ Exemple: Où sont les toilettes ?: トイレはどこですか`;
                 domElements.itineraryStartDateInput.max = TRIP_END_DATE;
                 domElements.itineraryStartDateInput.value = TRIP_START_DATE;
             }
-            if(domElements.calculateJrPassButton) { // Add event listener after DOM is loaded
+            if(domElements.calculateJrPassButton) { 
                  domElements.calculateJrPassButton.addEventListener('click', calculateAndDisplayJrPassProfitability);
             }
 
