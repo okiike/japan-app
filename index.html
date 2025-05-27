@@ -156,7 +156,7 @@
         .checklist-scroll-container { max-height: calc(100vh - 350px); } 
         .cities-scroll-container { max-height: calc(100vh - 270px); }
         .info-scroll-container { max-height: calc(100vh - 180px); }
-        .itinerary-scroll-container { max-height: calc(100vh - 320px); } /* Adjusted for form */
+        .itinerary-scroll-container { max-height: calc(100vh - 320px); } 
 
 
         .list-item { 
@@ -764,7 +764,7 @@
             if (screenId === 'itineraryScreen') {
                 populateItineraryCitySelect();
                 renderItinerary();
-                resetItineraryForm(); // Ensure form is in "add" mode when switching to this tab
+                resetItineraryForm(); 
             }
              if (screenId === 'infoScreen' && domElements.calculateJrPassButton) { 
                 domElements.calculateJrPassButton.addEventListener('click', calculateAndDisplayJrPassProfitability);
@@ -977,7 +977,7 @@
                             mapButton.addEventListener('click', (e) => {
                                 e.stopPropagation();
                                 const query = encodeURIComponent(`${attraction.text}, ${city.name}, Japon`);
-                                window.open(`https://maps.google.com/?q=${query}`, '_blank'); 
+                                window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank'); 
                             });
                             contentDiv.appendChild(mapButton);
                             
@@ -1144,43 +1144,60 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
             });
         }
         
-        function parseCostString(costStr) { 
-            if (!costStr || typeof costStr !== 'string' || costStr.toLowerCase() === "n/a") return 0;
-            const numbers = costStr.match(/\d[\d,]*\d?/g); 
-            if (!numbers) return 0;
-            
-            const cleanedNumbers = numbers.map(n => parseInt(n.replace(/,/g, ''), 10));
-            if (cleanedNumbers.length === 0) return 0;
-            if (cleanedNumbers.length === 1) return cleanedNumbers[0];
-            return Math.round((cleanedNumbers[0] + cleanedNumbers[1]) / 2); 
+        function parseGeminiCostResponse(responseText) {
+            if (!responseText) return 0;
+            const text = responseText.replace(/¥/g, '').replace(/,/g, '').trim(); 
+            const rangeMatch = text.match(/^(\d+)\s*-\s*(\d+)$/); 
+            if (rangeMatch) {
+                const num1 = parseInt(rangeMatch[1], 10);
+                const num2 = parseInt(rangeMatch[2], 10);
+                return Math.round((num1 + num2) / 2);
+            }
+            const singleNumberMatch = text.match(/^(\d+)$/); 
+            if (singleNumberMatch) {
+                return parseInt(singleNumberMatch[1], 10);
+            }
+            const anyNumberMatch = text.match(/\d+/);
+            if (anyNumberMatch) {
+                return parseInt(anyNumberMatch[0], 10);
+            }
+            return 0; 
         }
 
+        async function getTrainCostEstimateAI(city1Name, city2Name) {
+            if (city1Name === city2Name) return 0; 
 
-        function getTrainCostEstimate(city1Name, city2Name) {
-            const costs = { 
-                "Tokyo-Kyoto": 14000, // Average of 13k-15k
-                "Kyoto-Osaka": 1000,   // Average of 0.5k-1.5k
-                "Tokyo-Osaka": 15000,  // Average of 14k-16k
-                "Kyoto-Hiroshima": 11000,
-                "Tokyo-Hakone": 3000,
-                "Osaka-Hiroshima": 10000,
-                "Tokyo-Nikko": 3500,
-                "Kyoto-Nara": 850,
-                "Osaka-Nara": 650,
-                "Hakone-Kyoto": 13000,
-                "Hiroshima-Fukuoka": 9000, // Added more routes
-                "Tokyo-Kanazawa": 14000,
-                "Kyoto-Kanazawa": 7000,
-                "Osaka-Kanazawa": 7500,
-                "Tokyo-Sapporo": 25000, // Includes flight or very long train
-                "Osaka-Kobe": 500,
-                "Kyoto-Kobe": 700
-            };
-            const key1 = [city1Name, city2Name].sort().join('-'); // Sorted key
-            return costs[key1] || 0; 
+            const cacheKey = `trainCost-${[city1Name, city2Name].sort().join('-')}`;
+            const cachedCost = localStorage.getItem(cacheKey);
+            if (cachedCost) {
+                return parseInt(cachedCost, 10);
+            }
+
+            const prompt = `Estime le coût moyen en Yens d'un billet de train pour un adulte entre ${city1Name} et ${city2Name} au Japon. Si c'est un trajet typiquement fait en Shinkansen, base-toi sur cela. Réponds uniquement avec un nombre (par exemple, 14500) ou une fourchette de nombres (par exemple, 12000-15000). N'ajoute aucun texte explicatif.`;
+            try {
+                // Temporarily show a generic loading message for this specific AI call
+                // This avoids multiple global loading messages if called in a loop.
+                const tempLoadingMessage = document.getElementById(`trainCost-${city1Name}-${city2Name}`);
+                if (tempLoadingMessage) tempLoadingMessage.textContent = 'Estimation...';
+                
+                const responseText = await generateContentWithGemini(prompt); 
+                const cost = parseGeminiCostResponse(responseText);
+                
+                if (cost > 0) {
+                    localStorage.setItem(cacheKey, cost.toString()); // Cache the result
+                }
+                 if (tempLoadingMessage) tempLoadingMessage.textContent = cost > 0 ? `env. ¥${cost.toLocaleString()}` : 'Coût non estimé';
+                return cost;
+            } catch (error) {
+                console.error(`Erreur d'estimation du coût du train pour ${city1Name} - ${city2Name}:`, error);
+                // Don't show global error message here, as generateContentWithGemini already does.
+                const tempLoadingMessage = document.getElementById(`trainCost-${city1Name}-${city2Name}`);
+                if (tempLoadingMessage) tempLoadingMessage.textContent = 'Erreur estim.';
+                return 0; 
+            }
         }
         
-        function renderItinerary() {
+        async function renderItinerary() { // Made async
             if (!domElements.itineraryTimelineContainer) return;
             domElements.itineraryTimelineContainer.innerHTML = '';
             
@@ -1191,9 +1208,13 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
                 return;
             }
 
-            sortedItinerary.forEach((stop, index) => {
+            // Prepare to fetch all costs
+            const trainCostElements = []; // To update after fetching
+
+            for (let index = 0; index < sortedItinerary.length; index++) {
+                const stop = sortedItinerary[index];
                 const city = citiesData.find(c => c.id === stop.cityId);
-                if (!city) return; 
+                if (!city) continue; 
 
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'timeline-item';
@@ -1234,19 +1255,13 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
                 if (index > 0) {
                     const prevStop = sortedItinerary[index - 1];
                     const prevCity = citiesData.find(c => c.id === prevStop.cityId);
-                    if (prevCity) {
-                        const trainCost = getTrainCostEstimate(prevCity.name, city.name);
-                        if (trainCost > 0) {
-                            const trainP = document.createElement('p');
-                            trainP.className = 'timeline-train-cost';
-                            trainP.textContent = `Train depuis ${prevCity.name}: env. ¥${trainCost.toLocaleString()}`;
-                            contentDiv.appendChild(trainP);
-                        } else if (prevCity.name !== city.name) { // Only show if different cities and cost is 0 (unknown)
-                             const trainP = document.createElement('p');
-                            trainP.className = 'timeline-train-cost';
-                            trainP.textContent = `Train depuis ${prevCity.name}: Coût non estimé`;
-                            contentDiv.appendChild(trainP);
-                        }
+                    if (prevCity && prevCity.name !== city.name) {
+                        const trainCostP = document.createElement('p');
+                        trainCostP.className = 'timeline-train-cost';
+                        trainCostP.id = `trainCost-${prevCity.name}-${city.name}-${index}`; // Unique ID for update
+                        trainCostP.textContent = `Train depuis ${prevCity.name}: Estimation...`;
+                        contentDiv.appendChild(trainCostP);
+                        trainCostElements.push({element: trainCostP, city1: prevCity.name, city2: city.name });
                     }
                 }
                 
@@ -1267,10 +1282,22 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
                 actionsDiv.appendChild(deleteStopBtn);
                 contentDiv.appendChild(actionsDiv);
 
-
                 itemDiv.appendChild(contentDiv);
                 domElements.itineraryTimelineContainer.appendChild(itemDiv);
-            });
+            }
+
+            // After all initial elements are on the page, fetch and update costs
+            for (const item of trainCostElements) {
+                getTrainCostEstimateAI(item.city1, item.city2).then(cost => {
+                    if (cost > 0) {
+                        item.element.textContent = `Train depuis ${item.city1}: env. ¥${cost.toLocaleString()}`;
+                    } else {
+                        item.element.textContent = `Train depuis ${item.city1}: Coût non estimé`;
+                    }
+                }).catch(() => {
+                     item.element.textContent = `Train depuis ${item.city1}: Erreur estim.`;
+                });
+            }
         }
         
         function populateItineraryFormForEdit(stopId) {
@@ -1292,10 +1319,10 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
             editingItineraryStopId = null;
             domElements.editingItineraryStopIdInput.value = '';
             domElements.itineraryForm.reset();
-            domElements.itineraryStartDateInput.value = TRIP_START_DATE; // Reset to default start
+            domElements.itineraryStartDateInput.value = TRIP_START_DATE; 
             domElements.addItineraryStopButton.textContent = 'Ajouter Étape';
             domElements.cancelEditItineraryButton.style.display = 'none';
-            populateItineraryCitySelect(); // Ensure dropdown is reset
+            populateItineraryCitySelect(); 
         }
 
 
@@ -1323,21 +1350,15 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
                  return;
             }
             
-            // Simplified overlap check for editing:
-            // When editing, we allow the current stop's dates, but check against OTHERS.
             const otherStops = itineraryData.filter(s => s.id !== editingItineraryStopId);
-            let nextAvailableDate = new Date(tripStartDateObj);
-            const sortedOtherStops = [...otherStops].sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
-            
-            // Find the latest end date of stops *before* the current newStopDate
             let latestEndDateBeforeNewStop = new Date(tripStartDateObj);
-            latestEndDateBeforeNewStop.setDate(latestEndDateBeforeNewStop.getDate() -1); // to allow starting on trip start date
+            latestEndDateBeforeNewStop.setDate(latestEndDateBeforeNewStop.getDate() -1); 
 
-            for(const stop of sortedOtherStops) {
+            for(const stop of otherStops) { // Check against other stops only
                 const stopStartDate = new Date(stop.startDate + 'T00:00:00');
                 const stopEndDate = new Date(stopStartDate);
                 stopEndDate.setDate(stopStartDate.getDate() + parseInt(stop.durationNights));
-                if (stopEndDate <= newStopDate) { // if this stop ends before or on the day our new/edited stop begins
+                if (stopEndDate <= newStopDate) { 
                     latestEndDateBeforeNewStop = stopEndDate > latestEndDateBeforeNewStop ? stopEndDate : latestEndDateBeforeNewStop;
                 }
             }
@@ -1346,22 +1367,21 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
                  return;
              }
 
-            // Check if the new/edited stop overlaps with any stop *after* it
-            for(const stop of sortedOtherStops) {
+            for(const stop of otherStops) {
                  const stopStartDate = new Date(stop.startDate + 'T00:00:00');
-                 if (tempEndDate > stopStartDate && newStopDate < stopStartDate) { // If our stop ends after another begins, and starts before it
+                 if (tempEndDate > stopStartDate && newStopDate < stopStartDate) { 
                       showErrorMessage(`Cette étape chevauche une étape existante qui commence le ${stopStartDate.toLocaleDateString('fr-FR')}.`);
                       return;
                  }
             }
 
 
-            if (editingItineraryStopId) { // Update existing stop
+            if (editingItineraryStopId) { 
                 const stopIndex = itineraryData.findIndex(stop => stop.id === editingItineraryStopId);
                 if (stopIndex > -1) {
                     itineraryData[stopIndex] = { ...itineraryData[stopIndex], cityId, startDate: startDateStr, durationNights, notes };
                 }
-            } else { // Add new stop
+            } else { 
                 itineraryData.push({
                     id: generateId('itinerary'),
                     cityId,
@@ -1373,9 +1393,8 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
             
             renderItinerary();
             saveData();
-            resetItineraryForm(); // Reset form and editing state
+            resetItineraryForm(); 
             
-            // Suggest next start date based on the newly added/edited stop
             const suggestedNextStart = new Date(tempEndDate);
             if (suggestedNextStart <= tripEndDateObj) {
                  domElements.itineraryStartDateInput.value = suggestedNextStart.toISOString().split('T')[0];
@@ -1400,7 +1419,7 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
         }
         
         // --- JR Pass Calculator ---
-        function calculateAndDisplayJrPassProfitability() {
+        async function calculateAndDisplayJrPassProfitability() { // Made async
             if (!domElements.jrPassResultContainer) return;
 
             const sortedItinerary = [...itineraryData].sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
@@ -1409,15 +1428,33 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
                 domElements.jrPassResultContainer.style.display = 'block';
                 return;
             }
+            
+            showLoadingMessage("Calcul des coûts de train..."); // Show loading message
 
             let totalIndividualCost = 0;
+            const costPromises = [];
+
             for (let i = 0; i < sortedItinerary.length - 1; i++) {
-                const city1 = citiesData.find(c => c.id === sortedItinerary[i].cityId);
-                const city2 = citiesData.find(c => c.id === sortedItinerary[i+1].cityId);
-                if (city1 && city2 && city1.name !== city2.name) { // Only add cost if cities are different
-                    totalIndividualCost += getTrainCostEstimate(city1.name, city2.name);
+                const city1Data = citiesData.find(c => c.id === sortedItinerary[i].cityId);
+                const city2Data = citiesData.find(c => c.id === sortedItinerary[i+1].cityId);
+                if (city1Data && city2Data && city1Data.name !== city2Data.name) { 
+                    costPromises.push(getTrainCostEstimateAI(city1Data.name, city2Data.name));
+                } else {
+                    costPromises.push(Promise.resolve(0)); // No cost if same city or data missing
                 }
             }
+            
+            try {
+                const individualCosts = await Promise.all(costPromises);
+                totalIndividualCost = individualCosts.reduce((sum, cost) => sum + cost, 0);
+                hideLoadingMessage(); // Hide after all costs are fetched
+            } catch (error) {
+                hideLoadingMessage();
+                showErrorMessage("Erreur lors de l'estimation des coûts de train.");
+                console.error("Error fetching all train costs for JR Pass:", error);
+                return;
+            }
+
 
             let resultsHTML = `<p><strong>Coût total estimé des billets individuels :</strong> ¥${totalIndividualCost.toLocaleString()}</p>`;
             resultsHTML += `<p><strong>Comparaison avec les JR Pass (prix approximatifs) :</strong></p><ul>`;
