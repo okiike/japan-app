@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Planificateur de Voyage Japon</title>
     <style>
-        /* Styles généraux - Thème Sombre (Défaut) */
+        /* Styles généraux - Thème Sombre (Défaut initial, mais light est maintenant le défaut via JS) */
         :root {
             --bg-color: #1c1c1e; 
             --secondary-bg-color: #2c2c2e; 
@@ -23,32 +23,122 @@
             --font-family-system: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
 
-        /* Thème Clair */
+        /* Thème Clair (Nouveau Défaut via JS) */
         body.theme-light {
             --bg-color: #f2f2f7;
             --secondary-bg-color: #ffffff;
             --tertiary-bg-color: #e5e5ea;
             --text-color-primary: #000000;
-            --text-color-secondary: #3c3c43; /* Opacité 0.6 */
-            --text-color-tertiary: #3c3c43; /* Opacité 0.3 */
-            --accent-color: #007aff;
-            --destructive-color: #ff3b30;
-            --highlight-color: #ff9500;
+            --text-color-secondary: #3c3c43; 
+            --text-color-tertiary: #8A8A8E; 
+            --accent-color: #007aff; /* Bleu Apple */
+            --destructive-color: #ff3b30; /* Rouge Apple */
+            --highlight-color: #ff9500; /* Orange Apple */
             --border-color: #c6c6c8;
-            --separator-color: #c6c6c8;
+            --separator-color: #d1d1d6; 
             --icon-color: var(--text-color-tertiary);
             --icon-active-color: var(--accent-color);
         }
-        body.theme-light .button.add-button, 
-        body.theme-light .button.ai-button { 
-             color: #ffffff;
+        body.theme-light .button { /* Default button text for light theme */
+            color: #FFFFFF; 
+        }
+        body.theme-light .button.city-edit-button {
+            background-color: var(--accent-color); /* Bleu */
+            color: #FFFFFF;
+        }
+        body.theme-light .button.city-ai-button {
+            background-color: var(--highlight-color); /* Orange */
+            color: #FFFFFF;
+        }
+        body.theme-light .button.suggest-food-button { /* Specific class for food button */
+            background-color: #c0392b; /* Rouge foncé pour nourriture */
+            color: #FFFFFF;
         }
         body.theme-light .button.secondary-button {
-            color: var(--text-color-primary);
+            color: var(--text-color-primary); /* Texte foncé sur fond clair */
             background-color: #e5e5ea; 
         }
          body.theme-light .button.secondary-button:hover {
             background-color: #d1d1d6;
+        }
+        body.theme-light .timeline-train-cost {
+             color: #D35400; /* Orange plus foncé pour lisibilité */
+        }
+
+
+        /* Thème Brise Marine */
+        body.theme-ocean-breeze {
+            --bg-color: #E0F7FA; 
+            --secondary-bg-color: #FFFFFF;
+            --tertiary-bg-color: #B2EBF2; 
+            --text-color-primary: #004D40; 
+            --text-color-secondary: #00796B; 
+            --text-color-tertiary: #4DB6AC; 
+            --accent-color: #00BCD4; 
+            --destructive-color: #E57373; 
+            --highlight-color: #FFCA28; 
+            --border-color: #B0BEC5; 
+            --separator-color: #CFD8DC; 
+        }
+        body.theme-ocean-breeze .button {color: #004D40;} /* Texte foncé par défaut pour les boutons */
+        body.theme-ocean-breeze .button.add-button,
+        body.theme-ocean-breeze .button.city-edit-button {
+             background-color: var(--accent-color); /* Cyan */
+             color: #FFFFFF; /* Texte blanc sur cyan */
+        }
+        body.theme-ocean-breeze .button.ai-button,
+        body.theme-ocean-breeze .button.city-ai-button {
+             background-color: var(--highlight-color); /* Ambre */
+             color: #004D40; /* Texte foncé sur ambre */
+        }
+        body.theme-ocean-breeze .button.suggest-food-button {
+            background-color: #EF6C00; /* Orange foncé */
+            color: #FFFFFF;
+        }
+         body.theme-ocean-breeze .button.secondary-button {
+            color: var(--text-color-primary);
+            background-color: var(--tertiary-bg-color);
+        }
+        body.theme-ocean-breeze .timeline-train-cost {
+             color: #BF360C; 
+        }
+
+
+        /* Thème Fleur de Cerisier */
+        body.theme-sakura-spring {
+            --bg-color: #FFF0F5; 
+            --secondary-bg-color: #FFFFFF;
+            --tertiary-bg-color: #FFDDEE; 
+            --text-color-primary: #5D4037; 
+            --text-color-secondary: #8D6E63; 
+            --text-color-tertiary: #A1887F; 
+            --accent-color: #EC407A; 
+            --destructive-color: #EF5350; 
+            --highlight-color: #66BB6A; 
+            --border-color: #D7CCC8; 
+            --separator-color: #EFEBE9; 
+        }
+        body.theme-sakura-spring .button { color: #FFFFFF; }
+        body.theme-sakura-spring .button.add-button,
+        body.theme-sakura-spring .button.city-edit-button {
+             background-color: var(--accent-color); /* Rose */
+             color: #FFFFFF;
+        }
+        body.theme-sakura-spring .button.ai-button,
+        body.theme-sakura-spring .button.city-ai-button {
+             background-color: var(--highlight-color); /* Vert */
+             color: #FFFFFF;
+        }
+        body.theme-sakura-spring .button.suggest-food-button {
+            background-color: #D81B60; /* Magenta */
+            color: #FFFFFF;
+        }
+        body.theme-sakura-spring .button.secondary-button {
+            color: var(--text-color-primary);
+            background-color: var(--tertiary-bg-color);
+        }
+         body.theme-sakura-spring .timeline-train-cost {
+             color: #43A047; 
         }
 
 
@@ -180,6 +270,14 @@
         .button:hover { filter: brightness(1.15); }
         .ai-button { margin-bottom: 20px; }
         .small-button { padding: 8px 12px; font-size: 14px; }
+        .city-action-button { 
+            padding: 6px 10px;
+            font-size: 12px;
+            min-width: auto; 
+            flex-grow: 0; 
+            flex-shrink: 1; 
+            margin-top: 5px; /* Add some margin for wrapped buttons */
+        }
         .secondary-button { background-color: var(--tertiary-bg-color); }
 
 
@@ -270,12 +368,23 @@
             width: 20px; height: 20px; color: var(--text-color-tertiary);
             margin-left: 12px; display: flex; align-items: center; justify-content: center;
         }
-        .city-actions { display: flex; align-items: center; gap: 5px;}
-        .city-ai-button, .city-edit-button { 
-            background-color: var(--highlight-color); color: var(--text-color-primary); 
-            padding: 8px 12px; font-size: 13px; font-weight: 500;
+        .city-actions { 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            flex-wrap: wrap; 
+            justify-content: flex-end; 
+            flex-shrink: 0; /* Prevent actions div from shrinking too much */
+            margin-left: 10px; /* Add some space from city name if wrapping */
         }
-        .city-edit-button { background-color: var(--accent-color); }
+        .city-actions .button { 
+            padding: 6px 10px;
+            font-size: 12px;
+            min-width: auto; 
+            flex-grow: 0; 
+            flex-shrink: 0; /* Prevent individual buttons from shrinking too much */
+        }
+
         .delete-city-button-placeholder { padding: 8px; }
 
 
@@ -320,10 +429,9 @@
             line-height: 1.4; word-break: break-word;
             cursor: pointer;
             font-weight: 500; 
-            font-style: normal !important; /* Ensure not italic */
+            font-style: normal !important; 
         }
         .attraction-text.completed { text-decoration: line-through; color: var(--text-color-tertiary); }
-        /* .attraction-text.ai-suggestion { font-style: italic; color: var(--highlight-color); } REMOVED ITALIC */
         .attraction-text.ai-suggestion { color: var(--highlight-color); }
         
         .attraction-description {
@@ -505,15 +613,15 @@
             left: -40px; 
             display: flex;
             flex-direction: column;
-            gap: 8px; /* Increased gap */
+            gap: 8px; 
             z-index: 1; 
         }
         .reorder-buttons button {
-            background: none; border: none; padding: 0; /* Removed padding for tighter icon */
+            background: none; border: none; padding: 0; 
             cursor: pointer; color: var(--text-color-tertiary);
             display: flex; align-items: center; justify-content: center;
         }
-        .reorder-buttons button .svg-icon { width: 20px; height: 20px;} /* Slightly larger icons */
+        .reorder-buttons button .svg-icon { width: 20px; height: 20px;} 
         .reorder-buttons button:hover { color: var(--accent-color); }
 
 
@@ -696,8 +804,10 @@
                     <div class="form-group">
                         <label for="themeSelect">Thème de l'application :</label>
                         <select id="themeSelect" class="select-input">
-                            <option value="dark">Thème Sombre (Défaut)</option>
-                            <option value="light">Thème Clair</option>
+                            <option value="light">Thème Clair (Défaut)</option>
+                            <option value="dark">Thème Sombre</option>
+                            <option value="ocean-breeze">Brise Marine</option>
+                            <option value="sakura-spring">Fleur de Cerisier</option>
                         </select>
                     </div>
                 </div>
@@ -930,6 +1040,7 @@
 
         function loadData() {
             const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+            let currentTheme = 'theme-light'; // Default to light theme class name
             if (savedData) {
                 try {
                     const parsedData = JSON.parse(savedData);
@@ -943,11 +1054,7 @@
                     usefulWords = (parsedData.words || []).map(word => ({ ...word, id: word.id || generateId('word') }));
                     itineraryData = (parsedData.itinerary || []).map(stop => ({ ...stop, id: stop.id || generateId('itinerary')}));
                     
-                    if (parsedData.theme) {
-                        applyTheme(parsedData.theme);
-                        if (domElements.themeSelect) domElements.themeSelect.value = parsedData.theme.replace('theme-','');
-                    }
-
+                    currentTheme = parsedData.theme || 'theme-light'; 
 
                 } catch (error) {
                     console.error("Erreur lors du chargement des données:", error);
@@ -956,6 +1063,8 @@
             } else {
                  initializeDefaultDataArrays();
             }
+            applyTheme(currentTheme); 
+            if (domElements.themeSelect) domElements.themeSelect.value = currentTheme.replace('theme-','');
         }
 
         function initializeDefaultDataArrays() {
@@ -1278,7 +1387,7 @@
                 const cityActionsDiv = document.createElement('div'); cityActionsDiv.className = 'city-actions';
                 
                 const editCityButton = document.createElement('button');
-                editCityButton.className = 'button city-edit-button small-button';
+                editCityButton.className = 'button city-edit-button city-action-button';
                 editCityButton.innerHTML = icons.edit + ' Modifier';
                 editCityButton.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -1286,15 +1395,15 @@
                 });
                 cityActionsDiv.appendChild(editCityButton);
 
-                const aiButton = document.createElement('button'); aiButton.className = 'button city-ai-button small-button';
-                aiButton.innerHTML = icons.sparkle + ' Générer des idées d\'activités';
+                const aiButton = document.createElement('button'); aiButton.className = 'button city-ai-button city-action-button';
+                aiButton.innerHTML = icons.sparkle + ' Idées Activités';
                 aiButton.addEventListener('click', (e) => { e.stopPropagation(); suggestCityAttractions(city.id); });
                 cityActionsDiv.appendChild(aiButton);
                 
                 const suggestFoodButton = document.createElement('button');
-                suggestFoodButton.className = 'button small-button'; 
-                suggestFoodButton.style.backgroundColor = '#c0392b'; 
-                suggestFoodButton.innerHTML = icons.food + ' Suggérer Restaurants';
+                suggestFoodButton.className = 'button suggest-food-button city-action-button'; 
+                // suggestFoodButton.style.backgroundColor = '#c0392b'; // Color now handled by theme CSS
+                suggestFoodButton.innerHTML = icons.food + ' Restaurants';
                 suggestFoodButton.addEventListener('click', (e) => { e.stopPropagation(); suggestFoodForCity(city.id); });
                 cityActionsDiv.appendChild(suggestFoodButton);
 
@@ -1837,7 +1946,7 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
             let nextStartDateStr = TRIP_START_DATE;
             if(sortedItinerary.length > 0) {
                 const lastStop = sortedItinerary[sortedItinerary.length -1];
-                const lastStopEndDate = new Date(lastStop.startDate + "T00:00:00");
+                const lastStopEndDate = new Date(lastStop.startDate + "T00:00:00"); // Ensure parsing as local date
                 lastStopEndDate.setDate(lastStopEndDate.getDate() + parseInt(lastStop.durationNights));
                 
                 const tripEndDateObj = new Date(TRIP_END_DATE + "T00:00:00");
@@ -2038,10 +2147,19 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
         if(domElements.jpyInput) domElements.jpyInput.addEventListener('input', convertCurrency);
 
         function loadVoices() {
-            const voices = speechSynthesis.getVoices();
-            japaneseVoice = voices.find(voice => voice.lang === 'ja-JP');
-            if (!japaneseVoice && voices.length > 0) { 
-                japaneseVoice = voices.find(voice => voice.lang.startsWith('ja'));
+            try {
+                const voices = speechSynthesis.getVoices();
+                if (voices.length > 0) {
+                    japaneseVoice = voices.find(voice => voice.lang === 'ja-JP');
+                    if (!japaneseVoice) {
+                        japaneseVoice = voices.find(voice => voice.lang.startsWith('ja'));
+                    }
+                    // console.log("Japanese voice selected:", japaneseVoice ? japaneseVoice.name : "None available after filtering");
+                } else {
+                    // console.log("Voice list empty, will retry on 'voiceschanged' or speak attempt.");
+                }
+            } catch (e) {
+                console.error("Error loading voices:", e);
             }
         }
 
@@ -2058,46 +2176,32 @@ Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
             utterance.lang = lang;
             utterance.rate = 0.9;
 
+            let voices = speechSynthesis.getVoices();
+            if (voices.length === 0 && !japaneseVoice) { // If voices not loaded yet, try to load them
+                console.log("Retrying to load voices for TTS...");
+                speechSynthesis.onvoiceschanged = () => {
+                    loadVoices(); // This will set japaneseVoice
+                    if (japaneseVoice) utterance.voice = japaneseVoice;
+                    else console.warn("Still no Japanese voice after retry.");
+                    window.speechSynthesis.speak(utterance); // Speak after voices potentially loaded
+                };
+                // Some browsers (like Safari on iOS) might need a user gesture to trigger voice loading.
+                // This is a fallback, usually onvoiceschanged in DOMContentLoaded is better.
+                return; // Exit and wait for onvoiceschanged or next attempt
+            }
+            
             if (japaneseVoice) {
                 utterance.voice = japaneseVoice;
-            } else {
-                const voices = speechSynthesis.getVoices(); 
+            } else { // Fallback if japaneseVoice is still null
                 let voiceToUse = voices.find(voice => voice.lang === lang);
                 if (!voiceToUse) voiceToUse = voices.find(voice => voice.lang.startsWith('ja'));
-
-                if (voiceToUse) {
-                    utterance.voice = voiceToUse;
-                } else {
-                    console.warn(`Aucune voix japonaise (ja-JP ou ja*) trouvée. La voix par défaut du système sera utilisée si possible.`);
-                }
-                 if (voices.length === 0 && !japaneseVoice) {
-                     console.warn("Aucune voix de synthèse disponible sur cet appareil lors de la tentative de parole.");
-                     showErrorMessage("Aucune voix de synthèse n'est actuellement disponible sur cet appareil.");
-                     return;
-                 }
+                if (voiceToUse) utterance.voice = voiceToUse;
+                else console.warn(`Aucune voix japonaise spécifique trouvée pour TTS. Utilisation de la voix par défaut du navigateur pour ${lang}.`);
             }
             
             utterance.onerror = (event) => {
-                console.error('Erreur de synthèse vocale:', event.error);
-                let errorMessage = "Erreur de synthèse vocale.";
-                if (event.error === 'no-speech') {
-                    errorMessage = "Aucun son n'a pu être produit (no-speech).";
-                } else if (event.error === 'audio-busy') {
-                    errorMessage = "Le service audio est occupé (audio-busy).";
-                } else if (event.error === 'audio-hardware') {
-                    errorMessage = "Problème matériel audio (audio-hardware).";
-                } else if (event.error === 'network') {
-                    errorMessage = "Erreur réseau pour la synthèse vocale.";
-                } else if (event.error === 'synthesis-unavailable') {
-                    errorMessage = "Service de synthèse non disponible.";
-                } else if (event.error === 'synthesis-failed') {
-                    errorMessage = "La synthèse vocale a échoué.";
-                } else if (event.error === 'language-unavailable') {
-                    errorMessage = `La langue ${lang} n'est pas supportée pour la synthèse vocale.`;
-                } else if (event.error === 'voice-unavailable') {
-                    errorMessage = `La voix sélectionnée pour ${lang} n'est pas disponible.`;
-                }
-                showErrorMessage(errorMessage);
+                console.error('Erreur de synthèse vocale:', event.error, event);
+                showErrorMessage(`Erreur de synthèse vocale: ${event.error}`);
             };
             
             window.speechSynthesis.speak(utterance);
@@ -2142,14 +2246,17 @@ Exemple: Où sont les toilettes ?: トイレはどこですか`;
         }
         if(domElements.suggestWordsButton) domElements.suggestWordsButton.addEventListener('click', suggestNewWords);
 
-        function applyTheme(themeName) {
-            domElements.body.className = ''; 
-            if (themeName === 'light') {
-                domElements.body.classList.add('theme-light');
-            } else {
-                domElements.body.classList.add('theme-dark'); 
+        function applyTheme(themeNameInput) {
+            let themeClass = themeNameInput;
+            if (themeNameInput && !themeNameInput.startsWith('theme-')) { // Ensure "theme-" prefix if just name is passed
+                themeClass = `theme-${themeNameInput}`;
+            } else if (!themeNameInput) { // Fallback if undefined/null
+                themeClass = 'theme-light';
             }
-            localStorage.setItem('japanTripTheme', themeName);
+            
+            domElements.body.className = ''; // Clear existing theme classes
+            domElements.body.classList.add(themeClass); 
+            localStorage.setItem('japanTripTheme', themeClass); 
         }
 
 
@@ -2164,16 +2271,15 @@ Exemple: Où sont les toilettes ?: トイレはどこですか`;
 
         document.addEventListener('DOMContentLoaded', () => {
             if ('speechSynthesis' in window) {
-                speechSynthesis.onvoiceschanged = loadVoices;
-                loadVoices(); 
+                if (speechSynthesis.getVoices().length === 0) {
+                    speechSynthesis.onvoiceschanged = loadVoices;
+                } else {
+                    loadVoices(); 
+                }
             }
 
-            loadData(); 
-            const savedTheme = localStorage.getItem('japanTripTheme') || 'dark';
-            applyTheme(savedTheme);
-            if (domElements.themeSelect) domElements.themeSelect.value = savedTheme;
-
-
+            loadData(); // This now sets the default theme to 'theme-light' if nothing is saved
+            
             initIcons(); 
             setActiveScreen('checklistScreen'); 
             
@@ -2192,6 +2298,11 @@ Exemple: Où sont les toilettes ?: トイレはどこですか`;
             }
             if(domElements.themeSelect) {
                 domElements.themeSelect.addEventListener('change', (e) => applyTheme(e.target.value));
+                const currentThemeClass = domElements.body.className;
+                if (currentThemeClass.includes('theme-light')) domElements.themeSelect.value = 'light';
+                else if (currentThemeClass.includes('theme-ocean-breeze')) domElements.themeSelect.value = 'ocean-breeze';
+                else if (currentThemeClass.includes('theme-sakura-spring')) domElements.themeSelect.value = 'sakura-spring';
+                else domElements.themeSelect.value = 'dark'; 
             }
             if (domElements.closeCityModalButton) domElements.closeCityModalButton.onclick = closeEditCityModal;
             if (domElements.saveCityModalButton) domElements.saveCityModalButton.onclick = saveCityDetails;
