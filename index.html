@@ -35,7 +35,7 @@
             --accent-color: #007aff; 
             --destructive-color: #ff3b30; 
             --highlight-color: #ff9500; 
-            --food-button-color: #E67E22; 
+            --food-button-color: #E67E22; /* Darker orange for light theme food button */
             --border-color: #c6c6c8;
             --separator-color: #d1d1d6; 
             --icon-color: var(--text-color-tertiary);
@@ -44,15 +44,15 @@
         body.theme-light .button { 
             color: #FFFFFF; 
         }
-        body.theme-light .button.city-edit-icon-button { 
+        body.theme-light .button.city-edit-icon-button { /* Modifier button */
             background-color: var(--accent-color); 
             color: #FFFFFF;
         }
-        body.theme-light .button.city-ai-activity-button { 
+        body.theme-light .button.city-ai-activity-button { /* Idées Activités button */
             background-color: var(--highlight-color); 
             color: #FFFFFF;
         }
-        body.theme-light .button.suggest-food-button { 
+        body.theme-light .button.suggest-food-button { /* Restaurants button */
             background-color: var(--food-button-color); 
             color: #FFFFFF;
         }
@@ -79,7 +79,7 @@
             --accent-color: #00BCD4; 
             --destructive-color: #E57373; 
             --highlight-color: #FFCA28; 
-            --food-button-color: #FFA000; 
+            --food-button-color: #FFA000; /* Amber for food button */
             --border-color: #B0BEC5; 
             --separator-color: #CFD8DC; 
         }
@@ -118,7 +118,7 @@
             --accent-color: #EC407A; 
             --destructive-color: #EF5350; 
             --highlight-color: #66BB6A; 
-            --food-button-color: #D81B60; 
+            --food-button-color: #D81B60; /* Magenta for food */
             --border-color: #D7CCC8; 
             --separator-color: #EFEBE9; 
         }
@@ -180,13 +180,6 @@
             position: relative;
             -webkit-overflow-scrolling: touch;
         }
-        
-        #mainAppInterface {
-            display: flex; 
-            flex-direction: column;
-            height: 100%;
-        }
-
 
         .screen {
             display: none;
@@ -221,7 +214,7 @@
         .tab-bar {
             display: flex;
             height: 65px; 
-            border-top: 2px solid #FF9F0A; 
+            border-top: 1px solid var(--border-color);
             background-color: var(--secondary-bg-color); 
             flex-shrink: 0;
             padding-bottom: env(safe-area-inset-bottom);
@@ -288,16 +281,16 @@
             min-width: auto; 
             flex-grow: 0; 
             flex-shrink: 0; 
-            margin-top: 0; 
+            margin-top: 0; /* Reset margin if previously set */
         }
          .city-edit-icon-button {
             background-color: var(--accent-color);
             color: #ffffff;
-            padding: 8px; 
-            line-height: 0; 
+            padding: 8px; /* Square padding for icon */
+            line-height: 0; /* Helps center SVG */
         }
         .city-edit-icon-button .svg-icon {
-            width: 16px; 
+            width: 16px; /* Smaller icon for icon-only button */
             height: 16px;
         }
         .city-ai-activity-button {
@@ -401,15 +394,15 @@
         .city-actions { 
             display: flex; 
             align-items: center; 
-            gap: 5px; 
-            flex-wrap: nowrap; 
-            margin-left: auto; 
+            gap: 5px; /* Reduced gap */
+            flex-wrap: nowrap; /* Prevent wrapping of main action groups */
+            margin-left: auto; /* Push all actions to the right */
         }
         .stacked-ai-buttons {
             display: flex;
             flex-direction: column;
             gap: 5px;
-            margin-left: 8px; 
+            margin-left: 8px; /* Space between edit icon and this stack */
         }
         .city-actions .button { 
             flex-shrink: 0; 
@@ -762,481 +755,248 @@
     </style>
 </head>
 <body>
-    <div id="mainAppInterface"> 
-        <div class="status-bar-placeholder"></div>
+    <div class="status-bar-placeholder"></div>
 
-        <div class="main-content">
-            <div id="loadingMessage" class="loading-message">Chargement des suggestions IA...</div>
-            <div id="errorMessage" class="error-message">Une erreur est survenue.</div>
+    <div class="main-content">
+        <div id="loadingMessage" class="loading-message">Chargement des suggestions IA...</div>
+        <div id="errorMessage" class="error-message">Une erreur est survenue.</div>
 
-            <div id="checklistScreen" class="screen">
-                <h1 class="screen-title">Checklist avant départ</h1>
-                <div class="input-container">
-                    <input type="text" id="newItemInput" class="text-input" placeholder="Ajouter une tâche...">
-                    <button id="addItemButton" class="button add-button">Ajouter</button>
-                </div>
-                <div class="sort-buttons-container" id="checklistSortButtons">
-                    <button class="button" data-sort="recent">Par ajout (récent)</button>
-                    <button class="button" data-sort="oldest">Par ajout (ancien)</button>
-                    <button class="button" data-sort="incomplete">Non complétées</button>
-                    <button class="button" data-sort="complete">Complétées</button>
-                </div>
-                <button id="suggestTasksButton" class="button ai-button">
-                    <span id="aiButtonSuggestTaskIconPlaceholder"></span>
-                    Suggérer des tâches
-                </button>
-                <div id="checklistItemsContainer" class="scroll-container checklist-scroll-container"></div>
+        <div id="checklistScreen" class="screen active">
+            <h1 class="screen-title">Checklist avant départ</h1>
+            <div class="input-container">
+                <input type="text" id="newItemInput" class="text-input" placeholder="Ajouter une tâche...">
+                <button id="addItemButton" class="button add-button">Ajouter</button>
             </div>
-
-            <div id="citiesScreen" class="screen">
-                <h1 class="screen-title">Villes et activités</h1>
-                <div class="input-container"> 
-                    <input type="text" id="newCityInput" class="text-input" placeholder="Nom de la nouvelle ville...">
-                    <button id="addCityButton" class="button add-button">Ajouter Ville</button>
-                </div>
-                <div id="citiesListContainer" class="cities-scroll-container" style="padding:0; background-color: transparent;"></div>
+             <div class="sort-buttons-container" id="checklistSortButtons">
+                <button class="button" data-sort="recent">Par ajout (récent)</button>
+                <button class="button" data-sort="oldest">Par ajout (ancien)</button>
+                <button class="button" data-sort="incomplete">Non complétées</button>
+                <button class="button" data-sort="complete">Complétées</button>
             </div>
-            
-            <div id="itineraryScreen" class="screen">
-                <h1 class="screen-title">Mon itinéraire <span id="itineraryDatesTitle">(15 Nov - 29 Nov 2025)</span></h1>
-                <div id="itineraryPathContainer" class="itinerary-path-container">
-                    </div>
-                <form id="itineraryForm">
-                    <input type="hidden" id="editingItineraryStopId"> 
-                    <div class="form-group">
-                        <label for="itineraryCitySelect">Ville :</label>
-                        <select id="itineraryCitySelect" class="select-input"></select>
-                    </div>
-                    <div class="form-group">
-                        <label for="itineraryStartDate">Date de début :</label>
-                        <input type="date" id="itineraryStartDate" class="date-input" value="2025-11-15" min="2025-11-15" max="2025-11-29">
-                    </div>
-                    <div class="form-group">
-                        <label for="itineraryDurationNights">Nombre de nuits :</label>
-                        <input type="number" id="itineraryDurationNights" class="number-input" value="3" min="1">
-                    </div>
-                    <div class="form-group">
-                        <label for="itineraryNotes">Notes (optionnel) :</label>
-                        <textarea id="itineraryNotes" class="textarea-input" placeholder="Ex: Réservation hôtel XYZ, vol à 14h..."></textarea>
-                    </div>
-                    <div class="itinerary-form-buttons">
-                        <button type="submit" id="addItineraryStopButton" class="button add-button">Ajouter Étape</button>
-                        <button type="button" id="cancelEditItineraryButton" class="button secondary-button" style="display:none;">Annuler Modification</button>
-                    </div>
-                </form>
-                <div id="itineraryTimelineContainer" class="itinerary-scroll-container timeline">
-                    </div>
-            </div>
-
-            <div id="infoScreen" class="screen">
-                <h1 class="screen-title">Infos pratiques</h1>
-                <div class="info-scroll-container">
-                    <div class="info-section">
-                        <h2 class="info-section-title">Paramètres d'affichage</h2>
-                        <div class="form-group">
-                            <label for="themeSelect">Thème de l'application :</label>
-                            <select id="themeSelect" class="select-input">
-                                <option value="light">Thème Clair (Défaut)</option>
-                                <option value="dark">Thème Sombre</option>
-                                <option value="ocean-breeze">Brise Marine</option>
-                                <option value="sakura-spring">Fleur de Cerisier</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="info-section">
-                        <h2 class="info-section-title">Convertisseur de devises</h2>
-                        <p class="info-small-text" style="margin-bottom:10px;">Convertisseur EUR/JPY. Pour d'autres devises, veuillez utiliser un outil externe.</p>
-                        <div class="converter-container">
-                            <div class="converter-row">
-                                <input type="number" id="eurInput" placeholder="Montant en EUR">
-                                <span>EUR</span>
-                            </div>
-                            <div class="converter-row">
-                                <input type="number" id="jpyInput" placeholder="Montant en JPY">
-                                <span>JPY</span>
-                            </div>
-                        </div>
-                        <p class="info-small-text" id="conversionRateText">Taux : 1 EUR ≈ 160 JPY</p>
-                    </div>
-                    <div class="info-section" id="usefulWordsSection">
-                        <h2 class="info-section-title">Quelques mots utiles</h2>
-                        <p class="info-small-text" style="margin-bottom:10px;">L'IA suggérera des mots pour le Japon.</p>
-                        <div id="usefulWordsList" class="useful-words-list"></div>
-                        <button id="suggestWordsButton" class="button ai-button" style="margin-top: 15px; font-size: 14px; padding: 10px 15px; width:100%;">
-                            <span id="aiButtonSuggestWordIconPlaceholder"></span>
-                            Plus de mots
-                        </button>
-                    </div>
-
-                    <div class="info-section">
-                        <h2 class="info-section-title">Japan Rail Pass</h2>
-                        <p class="info-list-item">• Forfait économique pour voyager en train à travers le Japon.</p>
-                        <p class="info-list-item">• Valable sur la plupart des lignes JR, y compris de nombreux Shinkansen (trains à grande vitesse).</p>
-                        <p class="info-list-item">• Disponible pour des durées de 7, 14, ou 21 jours consécutifs.</p>
-                        <p class="info-list-item">• Prix (approximatifs, peuvent varier) :
-                            <ul>
-                                <li>7 jours : ~¥50,000</li>
-                                <li>14 jours : ~¥80,000</li>
-                                <li>21 jours : ~¥100,000</li>
-                            </ul>
-                        </p>
-                        <p class="info-list-item">• Doit généralement être acheté avant votre arrivée au Japon (bien que des options d'achat sur place existent, souvent plus chères).</p>
-                        <h3 style="margin-top: 20px; font-size: 16px; font-weight: 500;">Calculateur de rentabilité :</h3>
-                        <p class="info-text" style="margin-bottom:10px;">Cet outil vous aide à estimer si un JR Pass serait rentable pour votre voyage, basé sur l'itinéraire que vous avez défini.</p>
-                        <button id="calculateJrPassButton" class="button add-button" style="margin-bottom: 15px; width: 100%;">Calculer pour mon itinéraire</button>
-                        <div id="jrPassResultContainer" style="display: none;">
-                            </div>
-                    </div>
-
-                    <div class="info-section">
-                        <h2 class="info-section-title">Numéros d'urgence</h2>
-                        <p class="info-text">Ces numéros sont pour le Japon. Vérifiez les numéros locaux pour votre destination.</p>
-                        <p class="info-list-item">• Police : 110</p>
-                        <p class="info-list-item">• Pompiers / Ambulance : 119</p>
-                        <p class="info-list-item">• Japan Helpline (anglais) : 0570-000-911</p>
-                    </div>
-                </div>
-            </div>
+            <button id="suggestTasksButton" class="button ai-button">
+                <span id="aiButtonSuggestTaskIconPlaceholder"></span>
+                Suggérer des tâches
+            </button>
+            <div id="checklistItemsContainer" class="scroll-container checklist-scroll-container"></div>
         </div>
 
-        <div id="editCityModal" class="modal">
-            <div class="modal-content">
-                <span class="close-button" id="closeCityModal">×</span>
-                <h3>Modifier les détails de la ville</h3>
-                <input type="hidden" id="editingCityIdModal">
-                <div class="form-group">
-                    <label for="cityNameModalInput">Nom de la ville :</label>
-                    <input type="text" id="cityNameModalInput" class="text-input">
-                </div>
-                <div class="form-group">
-                    <label for="cityColorPalette">Couleur :</label>
-                    <div id="cityColorPalette" class="color-palette">
-                        </div>
-                    <input type="hidden" id="cityColorModalInputHidden">
-                </div>
-                <button id="saveCityModalButton" class="button add-button">Sauvegarder</button>
+        <div id="citiesScreen" class="screen">
+            <h1 class="screen-title">Villes et activités</h1>
+            <div class="input-container"> 
+                <input type="text" id="newCityInput" class="text-input" placeholder="Nom de la nouvelle ville...">
+                <button id="addCityButton" class="button add-button">Ajouter Ville</button>
             </div>
+            <div id="citiesListContainer" class="cities-scroll-container" style="padding:0; background-color: transparent;"></div>
+        </div>
+        
+        <div id="itineraryScreen" class="screen">
+            <h1 class="screen-title">Mon itinéraire (15 Nov - 29 Nov 2025)</h1>
+            <div id="itineraryPathContainer" class="itinerary-path-container">
+                </div>
+            <form id="itineraryForm">
+                <input type="hidden" id="editingItineraryStopId"> 
+                <div class="form-group">
+                    <label for="itineraryCitySelect">Ville :</label>
+                    <select id="itineraryCitySelect" class="select-input"></select>
+                </div>
+                <div class="form-group">
+                    <label for="itineraryStartDate">Date de début :</label>
+                    <input type="date" id="itineraryStartDate" class="date-input" value="2025-11-15" min="2025-11-15" max="2025-11-29">
+                </div>
+                <div class="form-group">
+                    <label for="itineraryDurationNights">Nombre de nuits :</label>
+                    <input type="number" id="itineraryDurationNights" class="number-input" value="3" min="1">
+                </div>
+                 <div class="form-group">
+                    <label for="itineraryNotes">Notes (optionnel) :</label>
+                    <textarea id="itineraryNotes" class="textarea-input" placeholder="Ex: Réservation hôtel XYZ, vol à 14h..."></textarea>
+                </div>
+                <div class="itinerary-form-buttons">
+                    <button type="submit" id="addItineraryStopButton" class="button add-button">Ajouter Étape</button>
+                    <button type="button" id="cancelEditItineraryButton" class="button secondary-button" style="display:none;">Annuler Modification</button>
+                </div>
+            </form>
+            <div id="itineraryTimelineContainer" class="itinerary-scroll-container timeline">
+                </div>
         </div>
 
+        <div id="infoScreen" class="screen">
+            <h1 class="screen-title">Infos pratiques</h1>
+            <div class="info-scroll-container">
+                <div class="info-section">
+                    <h2 class="info-section-title">Paramètres d'affichage</h2>
+                    <div class="form-group">
+                        <label for="themeSelect">Thème de l'application :</label>
+                        <select id="themeSelect" class="select-input">
+                            <option value="light">Thème Clair (Défaut)</option>
+                            <option value="dark">Thème Sombre</option>
+                            <option value="ocean-breeze">Brise Marine</option>
+                            <option value="sakura-spring">Fleur de Cerisier</option>
+                        </select>
+                    </div>
+                </div>
 
-        <div class="tab-bar">
-            <button class="tab-item active" data-screen="checklistScreen">
-                <span class="icon-placeholder" id="tabIconChecklist"></span>
-                <span class="tab-label">Checklist</span>
-            </button>
-            <button class="tab-item" data-screen="citiesScreen">
-                <span class="icon-placeholder" id="tabIconCities"></span>
-                <span class="tab-label">Villes & Activités</span>
-            </button>
-            <button class="tab-item" data-screen="itineraryScreen">
-                <span class="icon-placeholder" id="tabIconItinerary"></span>
-                <span class="tab-label">Itinéraire</span>
-            </button>
-            <button class="tab-item" data-screen="infoScreen">
-                <span class="icon-placeholder" id="tabIconInfo"></span>
-                <span class="tab-label">Infos</span>
-            </button>
+                <div class="info-section">
+                    <h2 class="info-section-title">Convertisseur de devises</h2>
+                    <div class="converter-container">
+                        <div class="converter-row">
+                            <input type="number" id="eurInput" placeholder="Montant en EUR">
+                            <span>EUR</span>
+                        </div>
+                        <div class="converter-row">
+                            <input type="number" id="jpyInput" placeholder="Montant en JPY">
+                            <span>JPY</span>
+                        </div>
+                    </div>
+                    <p class="info-small-text" id="conversionRateText">Taux : 1 EUR ≈ 160 JPY</p>
+                </div>
+                <div class="info-section" id="usefulWordsSection">
+                    <h2 class="info-section-title">Quelques mots utiles</h2>
+                    <div id="usefulWordsList" class="useful-words-list"></div>
+                    <button id="suggestWordsButton" class="button ai-button" style="margin-top: 15px; font-size: 14px; padding: 10px 15px; width:100%;">
+                        <span id="aiButtonSuggestWordIconPlaceholder"></span>
+                        Plus de mots
+                    </button>
+                </div>
+
+                <div class="info-section">
+                    <h2 class="info-section-title">Japan Rail Pass</h2>
+                    <p class="info-list-item">• Forfait économique pour voyager en train à travers le Japon.</p>
+                    <p class="info-list-item">• Valable sur la plupart des lignes JR, y compris de nombreux Shinkansen (trains à grande vitesse).</p>
+                    <p class="info-list-item">• Disponible pour des durées de 7, 14, ou 21 jours consécutifs.</p>
+                    <p class="info-list-item">• Prix (approximatifs, peuvent varier) :
+                        <ul>
+                            <li>7 jours : ~¥50,000</li>
+                            <li>14 jours : ~¥80,000</li>
+                            <li>21 jours : ~¥100,000</li>
+                        </ul>
+                    </p>
+                     <p class="info-list-item">• Doit généralement être acheté avant votre arrivée au Japon (bien que des options d'achat sur place existent, souvent plus chères).</p>
+                    <h3 style="margin-top: 20px; font-size: 16px; font-weight: 500;">Calculateur de rentabilité :</h3>
+                    <p class="info-text" style="margin-bottom:10px;">Cet outil vous aide à estimer si un JR Pass serait rentable pour votre voyage, basé sur l'itinéraire que vous avez défini.</p>
+                    <button id="calculateJrPassButton" class="button add-button" style="margin-bottom: 15px; width: 100%;">Calculer pour mon itinéraire</button>
+                    <div id="jrPassResultContainer" style="display: none;">
+                        </div>
+                </div>
+
+                <div class="info-section">
+                    <h2 class="info-section-title">Numéros d'urgence</h2>
+                    <p class="info-list-item">• Police : 110</p>
+                    <p class="info-list-item">• Pompiers / Ambulance : 119</p>
+                    <p class="info-list-item">• Japan Helpline (anglais) : 0570-000-911</p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <script type="module">
-        // Firebase Imports
-        import { initializeApp as initializeFirebaseApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; 
-
-    // TODO: Collez votre objet firebaseConfig ici
-    const firebaseConfig = { apiKey: "AIzaSyAi5nJgFtfxeMYm9zhf6gokI1x6MBfCol0",
-  authDomain: "monplanificateurvoyage.firebaseapp.com",
-  projectId: "monplanificateurvoyage",
-  storageBucket: "monplanificateurvoyage.firebasestorage.app",
-  messagingSenderId: "932990618668",
-  appId: "1:932990618668:web:8aae0bb8f220a096665589" };
-
-
-    const SHARED_TRIP_ID = "VOYAGE_JAPON"; 
-
-    let app, auth, db, userId;
-    let unsubscribeFirestore = null;
-
-
-    // --- Global Variables & Constants ---
-    const icons = { 
-        checklist: '<svg class="svg-icon large" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2ZM18 20H6V4H13V9H18V20ZM8 11H16V13H8V11ZM8 15H16V17H8V15Z"/></svg>',
-        cities: '<svg class="svg-icon large" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2ZM12 11.5C10.62 11.5 9.5 10.38 9.5 9C9.5 7.62 10.62 6.5 12 6.5C13.38 6.5 14.5 7.62 14.5 9C14.5 10.38 13.38 11.5 12 11.5Z"/></svg>',
-        info: '<svg class="svg-icon large" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 17C11.45 17 11 16.55 11 16V12C11 11.45 11.45 11 12 11C12.55 11 13 11.45 13 12V16C13 16.55 12.55 17 12 17ZM12 9C11.45 9 11 8.55 11 8C11 7.45 11.45 7 12 7C12.55 7 13 7.45 13 8C13 8.55 12.55 9 12 9Z"/></svg>',
-        itinerary: '<svg class="svg-icon large" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M18.24 13.76L12 10.03L5.76 13.76L4 12.59L12 7.41l8 5.18l-1.76 1.17zM12 3C6.48 3 2 5.24 2 8c0 2.24 2.95 4.12 7 4.87V19H7v2h10v-2h-2v-6.13c4.05-.75 7-2.63 7-4.87c0-2.76-4.48-5-10-5zm0 2c3.78 0 7.35 1.53 8.91 3.09C19.26 9.04 16.29 10 12 10s-7.26-.96-8.91-1.91C4.65 6.53 8.22 5 12 5z"/></svg>',
-        checkboxEmpty: '<svg class="svg-icon medium" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M19 5V19H5V5H19ZM19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3Z"/></svg>',
-        checkboxChecked: '<svg class="svg-icon medium" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z"/></svg>',
-        trash: '<svg class="svg-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M6 19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7H6V19ZM19 4H15.5L14.5 3H9.5L8.5 4H5V6H19V4Z"/></svg>',
-        plus: '<svg class="svg-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M19 13H13V19H11V13H5V11H11V5H13V11H19V13Z"/></svg>',
-        minus: '<svg class="svg-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M19 13H5V11H19V13Z"/></svg>',
-        sparkle: '<svg class="svg-icon small" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L9.5 8.5L3 10L9.5 11.5L12 18L14.5 11.5L21 10L14.5 8.5L12 2Z"/></svg>',
-        speaker: '<svg class="svg-icon small" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M3 9V15H7L12 20V4L7 9H3ZM16.5 12C16.5 10.23 15.48 8.71 14 7.97V16.02C15.48 15.29 16.5 13.77 16.5 12ZM14 3.23V5.29C16.89 6.15 19 8.83 19 12C19 15.17 16.89 17.84 14 18.7V20.77C18.01 19.86 21 16.28 21 12C21 7.72 18.01 4.14 14 3.23Z"/></svg>',
-        chevronDown: '<svg class="svg-icon small" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6l-6-6l1.41-1.41z"/></svg>',
-        chevronUp: '<svg class="svg-icon small" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6l-6 6l1.41 1.41z"/></svg>',
-        mapMarker: '<svg class="svg-icon small" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>',
-        calendar: '<svg class="svg-icon small" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>',
-        edit: '<svg class="svg-icon small" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>',
-        arrowUp: '<svg class="svg-icon small" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6l-6 6z"/></svg>',
-        arrowDown: '<svg class="svg-icon small" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6l-6 6z"/></svg>',
-        food: '<svg class="svg-icon small" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M16 6v8h3v8h-3v-2h-2v2H8v-2H6v2H3V14h3V6H3V4h3V2h8v2h3v2h-3zm-2 0H8v6h6V6zm0 8H8v6h6v-6z"/></svg>', 
-        route: '<svg class="svg-icon large" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M19.41,6.59 C19.02,6.2 18.39,6.2 18,6.59 L12,12.59 L6,6.59 C5.61,6.2 4.98,6.2 4.59,6.59 C4.2,6.98 4.2,7.61 4.59,8 L11.29,14.71 C11.68,15.1 12.31,15.1 12.7,14.71 L19.41,8 C19.8,7.61 19.8,6.98 19.41,6.59 Z M12,2 C6.48,2 2,6.48 2,12 C2,17.52 6.48,22 12,22 C17.52,22 22,17.52 22,12 C22,6.48 17.52,2 12,2 Z M12,20 C7.59,20 4,16.41 4,12 C4,7.59 7.59,4 12,4 C16.41,4 20,7.59 20,12 C20,16.41 16.41,20 12,20 Z"/></svg>' 
-    };
-    const currentDestination = "Japon"; 
-    let currentExchangeRate = 160; 
-    let TRIP_START_DATE = '2025-11-15'; 
-    let TRIP_END_DATE = '2025-11-29';   
-    let checklistItems = [];
-    let citiesData = [];
-    let usefulWords = [];
-    let itineraryData = [];
-    let editingItineraryStopId = null; 
-    let japaneseVoice = null; 
-    let currentChecklistSort = 'recent'; 
-    const jrPassPrices = { 7: 50000, 14: 80000, 21: 100000 };
-    const cityColorPalette = [
-        { name: "Rouge Fuji", value: "#D90429" }, { name: "Rose Sakura", value: "#FFB7C5" },
-        { name: "Orange Yuzu", value: "#FF8C00" }, { name: "Jaune Ginkgo", value: "#FFD700" },
-        { name: "Vert Matcha", value: "#6B8E23" }, { name: "Bleu Aizome", value: "#0072BB" },
-        { name: "Violet Ajisai", value: "#8A2BE2" }, { name: "Gris Kumo", value: "#808080" },
-        { name: "Brun Sugi", value: "#A0522D" }, { name: "Noir Sumi", value: "#2F4F4F" }
-    ];
-    const activityCategoryStyles = {
-        "Culturel": { color: "#8e44ad", icon: "🏛️" }, "Nature": { color: "#27ae60", icon: "🌳" },   
-        "Nourriture": { color: "#e67e22", icon: "🍜" }, "Shopping": { color: "#3498db", icon: "🛍️" }, 
-        "Monument": { color: "#7f8c8d", icon: "🗿" }, "Point d'intérêt": { color: "#f1c40f", icon: "📍" }, 
-        "Nourriture & Restaurants": { color: "#e74c3c", icon: "🍽️" }, 
-        "Suggestion": { color: "#95a5a6", icon: "💡" }, "Autre": { color: "#bdc3c7", icon: "➡️" } 
-    };
-    let domElements = {}; 
-
-    // --- Function Definitions ---
-    function generateId(prefix = 'item') {
-        return `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    }
-    
-    function sanitizeObjectForFirestore(obj) {
-        if (obj === null || typeof obj !== 'object') { return obj; }
-        if (Array.isArray(obj)) { return obj.map(item => sanitizeObjectForFirestore(item)).filter(item => item !== undefined); }
-        const sanitized = {};
-        for (const key in obj) {
-            if (Object.prototype.hasOwnProperty.call(obj, key)) {
-                const value = obj[key];
-                if (value !== undefined) { sanitized[key] = sanitizeObjectForFirestore(value); }
-            }
-        }
-        return sanitized;
-    }
-
-    function getRandomColor() { return cityColorPalette[Math.floor(Math.random() * cityColorPalette.length)].value; }
+    <div id="editCityModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeCityModal">×</span>
+            <h3>Modifier les détails de la ville</h3>
+            <input type="hidden" id="editingCityIdModal">
+            <div class="form-group">
+                <label for="cityNameModalInput">Nom de la ville :</label>
+                <input type="text" id="cityNameModalInput" class="text-input">
+            </div>
+            <div class="form-group">
+                <label for="cityColorPalette">Couleur :</label>
+                <div id="cityColorPalette" class="color-palette">
+                    </div>
+                <input type="hidden" id="cityColorModalInputHidden">
+            </div>
+            <button id="saveCityModalButton" class="button add-button">Sauvegarder</button>
+        </div>
+    </div>
 
 
-    async function saveTripDataToFirestore() {
-        if (!userId || !db) { console.warn("Firestore not initialized or user not authenticated for saving."); return; }
-        try {
-            let dataToSave = {
-                checklistItems: checklistItems || [], citiesData: citiesData || [], usefulWords: usefulWords || [], itineraryData: itineraryData || [],
-                theme: domElements.body.className || 'theme-light', tripStartDate: TRIP_START_DATE || '2025-11-15', tripEndDate: TRIP_END_DATE || '2025-11-29',
-                lastUpdated: serverTimestamp() 
-            };
-            dataToSave = sanitizeObjectForFirestore(dataToSave); 
-            await setDoc(doc(db, "tripPlans", SHARED_TRIP_ID), dataToSave);
-        } catch (error) { console.error("Erreur lors de la sauvegarde sur Firestore:", error); showErrorMessage("Impossible de sauvegarder les données sur le serveur."); }
-    }
+    <div class="tab-bar">
+        <button class="tab-item active" data-screen="checklistScreen">
+            <span class="icon-placeholder" id="tabIconChecklist"></span>
+            <span class="tab-label">Checklist</span>
+        </button>
+        <button class="tab-item" data-screen="citiesScreen">
+            <span class="icon-placeholder" id="tabIconCities"></span>
+            <span class="tab-label">Villes & Activités</span>
+        </button>
+        <button class="tab-item" data-screen="itineraryScreen">
+            <span class="icon-placeholder" id="tabIconItinerary"></span>
+            <span class="tab-label">Itinéraire</span>
+        </button>
+        <button class="tab-item" data-screen="infoScreen">
+            <span class="icon-placeholder" id="tabIconInfo"></span>
+            <span class="tab-label">Infos</span>
+        </button>
+    </div>
 
-    function loadTripDataFromFirestore() {
-        if (!userId || !db) {
-            console.warn("Firestore not initialized or user not authenticated for loading.");
-            initializeDefaultDataArrays(); 
-            renderAllUIComponents();     
-            return;
-        }
-        if (unsubscribeFirestore) unsubscribeFirestore(); 
-        unsubscribeFirestore = onSnapshot(doc(db, "tripPlans", SHARED_TRIP_ID), (docSnap) => {
-            let currentTheme = 'theme-light';
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                checklistItems = (data.checklistItems || []).map(item => ({ ...item, id: item.id || generateId('checklist'), description: item.description || '', isExpanded: item.isExpanded || false, createdAt: item.createdAt || Date.now() }));
-                citiesData = (data.citiesData || []).map(city => ({ 
-                    ...city, id: city.id || generateId('city'), color: city.color || getRandomColor(), 
-                    attractions: (city.attractions || []).map(attr => ({...attr, id: attr.id || generateId('attr'), description: attr.description || ''})) 
-                }));
-                usefulWords = (data.usefulWords || []).map(word => ({ ...word, id: word.id || generateId('word') }));
-                itineraryData = (data.itineraryData || []).map(stop => ({ ...stop, id: stop.id || generateId('itinerary')}));
-                currentTheme = data.theme || 'theme-light'; 
-                TRIP_START_DATE = data.tripStartDate || '2025-11-15'; 
-                TRIP_END_DATE = data.tripEndDate || '2025-11-29';
-                console.log("Données chargées depuis Firestore pour :", SHARED_TRIP_ID);
-            } else {
-                console.log("Aucune donnée trouvée pour ce voyage, initialisation des données par défaut et sauvegarde sur Firestore.");
-                initializeDefaultDataArrays(); 
-                saveTripDataToFirestore(); 
-            }
-            applyTheme(currentTheme); 
-            if (domElements.themeSelect) domElements.themeSelect.value = currentTheme.replace('theme-','');
-            updateTripDatesUI();
-            renderAllUIComponents();
-        }, (error) => {
-            console.error("Erreur de lecture Firestore:", error);
-            showErrorMessage("Erreur de synchronisation des données. Utilisation des données locales par défaut.");
-            initializeDefaultDataArrays(); 
-            renderAllUIComponents();     
-        });
-    }
+    <script>
+        // --- Définitions des Icônes SVG ---
+        const icons = { 
+            checklist: '<svg class="svg-icon large" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2ZM18 20H6V4H13V9H18V20ZM8 11H16V13H8V11ZM8 15H16V17H8V15Z"/></svg>',
+            cities: '<svg class="svg-icon large" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2ZM12 11.5C10.62 11.5 9.5 10.38 9.5 9C9.5 7.62 10.62 6.5 12 6.5C13.38 6.5 14.5 7.62 14.5 9C14.5 10.38 13.38 11.5 12 11.5Z"/></svg>',
+            info: '<svg class="svg-icon large" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 17C11.45 17 11 16.55 11 16V12C11 11.45 11.45 11 12 11C12.55 11 13 11.45 13 12V16C13 16.55 12.55 17 12 17ZM12 9C11.45 9 11 8.55 11 8C11 7.45 11.45 7 12 7C12.55 7 13 7.45 13 8C13 8.55 12.55 9 12 9Z"/></svg>',
+            itinerary: '<svg class="svg-icon large" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M18.24 13.76L12 10.03L5.76 13.76L4 12.59L12 7.41l8 5.18l-1.76 1.17zM12 3C6.48 3 2 5.24 2 8c0 2.24 2.95 4.12 7 4.87V19H7v2h10v-2h-2v-6.13c4.05-.75 7-2.63 7-4.87c0-2.76-4.48-5-10-5zm0 2c3.78 0 7.35 1.53 8.91 3.09C19.26 9.04 16.29 10 12 10s-7.26-.96-8.91-1.91C4.65 6.53 8.22 5 12 5z"/></svg>',
+            checkboxEmpty: '<svg class="svg-icon medium" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M19 5V19H5V5H19ZM19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3Z"/></svg>',
+            checkboxChecked: '<svg class="svg-icon medium" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z"/></svg>',
+            trash: '<svg class="svg-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M6 19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7H6V19ZM19 4H15.5L14.5 3H9.5L8.5 4H5V6H19V4Z"/></svg>',
+            plus: '<svg class="svg-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M19 13H13V19H11V13H5V11H11V5H13V11H19V13Z"/></svg>',
+            minus: '<svg class="svg-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M19 13H5V11H19V13Z"/></svg>',
+            sparkle: '<svg class="svg-icon small" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L9.5 8.5L3 10L9.5 11.5L12 18L14.5 11.5L21 10L14.5 8.5L12 2Z"/></svg>',
+            speaker: '<svg class="svg-icon small" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M3 9V15H7L12 20V4L7 9H3ZM16.5 12C16.5 10.23 15.48 8.71 14 7.97V16.02C15.48 15.29 16.5 13.77 16.5 12ZM14 3.23V5.29C16.89 6.15 19 8.83 19 12C19 15.17 16.89 17.84 14 18.7V20.77C18.01 19.86 21 16.28 21 12C21 7.72 18.01 4.14 14 3.23Z"/></svg>',
+            chevronDown: '<svg class="svg-icon small" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6l-6-6l1.41-1.41z"/></svg>',
+            chevronUp: '<svg class="svg-icon small" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6l-6 6l1.41 1.41z"/></svg>',
+            mapMarker: '<svg class="svg-icon small" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>',
+            calendar: '<svg class="svg-icon small" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>',
+            edit: '<svg class="svg-icon small" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>',
+            arrowUp: '<svg class="svg-icon small" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6l-6 6z"/></svg>',
+            arrowDown: '<svg class="svg-icon small" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6l-6 6z"/></svg>',
+            food: '<svg class="svg-icon small" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M16 6v8h3v8h-3v-2h-2v2H8v-2H6v2H3V14h3V6H3V4h3V2h8v2h3v2h-3zm-2 0H8v6h6V6zm0 8H8v6h6v-6z"/></svg>', 
+            route: '<svg class="svg-icon large" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M19.41,6.59 C19.02,6.2 18.39,6.2 18,6.59 L12,12.59 L6,6.59 C5.61,6.2 4.98,6.2 4.59,6.59 C4.2,6.98 4.2,7.61 4.59,8 L11.29,14.71 C11.68,15.1 12.31,15.1 12.7,14.71 L19.41,8 C19.8,7.61 19.8,6.98 19.41,6.59 Z M12,2 C6.48,2 2,6.48 2,12 C2,17.52 6.48,22 12,22 C17.52,22 22,17.52 22,12 C22,6.48 17.52,2 12,2 Z M12,20 C7.59,20 4,16.41 4,12 C4,7.59 7.59,4 12,4 C16.41,4 20,7.59 20,12 C20,16.41 16.41,20 12,20 Z"/></svg>' 
+        };
 
-    function initializeDefaultDataArrays() { 
-        checklistItems = [ 
-            { id: generateId('checklist'), text: 'Réserver les vols', completed: false, description: '', isExpanded: false, createdAt: Date.now() - 20000 }, 
-            { id: generateId('checklist'), text: 'Réserver les hébergements', completed: false, description: '', isExpanded: false, createdAt: Date.now() - 10000 }
+        const LOCAL_STORAGE_KEY = 'japanTripPlannerData_v4'; 
+        let currentExchangeRate = 160; 
+        
+        const TRIP_START_DATE = '2025-11-15';
+        const TRIP_END_DATE = '2025-11-29';
+
+        let checklistItems = [];
+        let citiesData = [];
+        let usefulWords = [];
+        let itineraryData = [];
+        let editingItineraryStopId = null; 
+        let japaneseVoice = null; 
+        let currentChecklistSort = 'recent'; 
+        
+        const jrPassPrices = { 
+            7: 50000,
+            14: 80000,
+            21: 100000
+        };
+
+        const cityColorPalette = [
+            { name: "Rouge Fuji", value: "#D90429" }, { name: "Rose Sakura", value: "#FFB7C5" },
+            { name: "Orange Yuzu", value: "#FF8C00" }, { name: "Jaune Ginkgo", value: "#FFD700" },
+            { name: "Vert Matcha", value: "#6B8E23" }, { name: "Bleu Aizome", value: "#0072BB" },
+            { name: "Violet Ajisai", value: "#8A2BE2" }, { name: "Gris Kumo", value: "#808080" },
+            { name: "Brun Sugi", value: "#A0522D" }, { name: "Noir Sumi", value: "#2F4F4F" }
         ];
-        citiesData = [ 
-            { id: generateId('city'), name: 'Tokyo', color: getRandomColor(), isExpanded: false, attractions: [
-                { id: generateId('attr'), text: 'Traversée de Shibuya', category: 'Point d\'intérêt', price: 'Gratuit', completed: false, description: 'Le passage piéton le plus fréquenté au monde.' },
-                { id: generateId('attr'), text: 'Tour de Tokyo', category: 'Monument', price: '¥¥', completed: false, description: 'Tour d\'observation et de communication inspirée de la Tour Eiffel.' }
-            ]},
-            { id: generateId('city'), name: 'Kyoto', color: getRandomColor(), isExpanded: false, attractions: [
-                { id: generateId('attr'), text: 'Kinkaku-ji (Pavillon d\'Or)', category: 'Culturel', price: '¥', completed: false, description: 'Célèbre temple Zen recouvert de feuilles d\'or.' }
-            ]}
-        ];
-        usefulWords = [ 
-            { id: generateId('word'), text: "Bonjour", translation: "こんにちは", isAISuggestion: false, lang: "ja-JP" },
-            { id: generateId('word'), text: "Merci", translation: "ありがとう", isAISuggestion: false, lang: "ja-JP" },
-            { id: generateId('word'), text: "S'il vous plaît", translation: "おねがいします", isAISuggestion: false, lang: "ja-JP" }
-        ];
-        itineraryData = [];
-        TRIP_START_DATE = '2025-11-15'; 
-        TRIP_END_DATE = '2025-11-29';
-        updateTripDatesUI();
-    }
-    
-    function updateTripDatesUI() { /* ... (as before) ... */ }
-    function showLoadingMessage(message = "Chargement...") { /* ... (as before) ... */ }
-    function hideLoadingMessage() { /* ... (as before) ... */ }
-    function showErrorMessage(message = "Une erreur est survenue.") { /* ... (as before) ... */ }
-    async function generateContentWithGemini(prompt) { /* ... (as before) ... */ }
-    function setActiveScreen(screenId) { /* ... (as before) ... */ }
-    function sortChecklistItems() { /* ... (as before) ... */ }
-    function updateActiveSortButton() { /* ... (as before) ... */ }
-    function renderChecklistItems() { /* ... (as before) ... */ }
-    function toggleChecklistItemCompleted(id) { /* ... (as before, calls saveTripDataToFirestore) ... */ }
-    function toggleChecklistItemExpansion(id) { /* ... (as before, calls saveTripDataToFirestore) ... */ }
-    function updateChecklistItemDescription(id, description) { /* ... (as before, calls saveTripDataToFirestore) ... */ }
-    function deleteChecklistItem(id) { /* ... (as before, calls saveTripDataToFirestore) ... */ }
-    function addChecklistItem() { /* ... (as before, calls saveTripDataToFirestore) ... */ }
-    async function suggestNewTasks() { /* ... (as before, calls saveTripDataToFirestore) ... */ }
-    function openEditCityModal(cityId) { /* ... (as before) ... */ }
-    function closeEditCityModal() { /* ... (as before) ... */ }
-    function saveCityDetails() { /* ... (as before, calls saveTripDataToFirestore) ... */ }
-    function renderCities() { /* ... (as before) ... */ }
-    function addManualActivityToCity(cityId) { /* ... (as before, calls saveTripDataToFirestore) ... */ }
-    function addCity() { /* ... (as before, calls saveTripDataToFirestore) ... */ }
-    function deleteCity(cityId) { /* ... (as before, calls saveTripDataToFirestore) ... */ }
-    function toggleCityAttractionCompleted(cityId, attractionId) { /* ... (as before, calls saveTripDataToFirestore) ... */ }
-    function deleteCityAttraction(cityId, attractionId) { /* ... (as before, calls saveTripDataToFirestore) ... */ }
-    async function suggestCityAttractions(cityId) { /* ... (as before, calls saveTripDataToFirestore) ... */ }
-    async function suggestFoodForCity(cityId) { /* ... (as before, calls saveTripDataToFirestore) ... */ }
-    function renderItineraryPath() { /* ... (as before) ... */ }
-    function populateItineraryCitySelect() { /* ... (as before) ... */ }
-    function parseGeminiCostResponse(responseText) { /* ... (as before) ... */ }
-    async function getTrainCostEstimateAI(city1Name, city2Name, elementToUpdate) { /* ... (as before) ... */ }
-    async function renderItinerary() { /* ... (as before) ... */ }
-    function moveItineraryStop(oldIndexSorted, newIndexSorted) { /* ... (as before, calls saveTripDataToFirestore) ... */ }
-    function populateItineraryFormForEdit(stopId) { /* ... (as before) ... */ }
-    function resetItineraryForm() { /* ... (as before) ... */ }
-    function handleItineraryFormSubmit(event) { /* ... (as before, calls saveTripDataToFirestore) ... */ }
-    function deleteItineraryStop(stopId) { /* ... (as before, calls saveTripDataToFirestore) ... */ }
-    async function calculateAndDisplayJrPassProfitability() { /* ... (as before) ... */ }
-    function updateConversionRateText() { /* ... (as before) ... */ }
-    function convertCurrency() { /* ... (as before) ... */ }
-    function loadVoices() { /* ... (as before) ... */ }
-    function speak(text, lang = 'ja-JP') { /* ... (as before) ... */ }
-    function renderUsefulWords() { /* ... (as before) ... */ }
-    async function suggestNewWords() { /* ... (as before, calls saveTripDataToFirestore) ... */ }
-    function applyTheme(themeNameInput) { /* ... (as before, calls saveTripDataToFirestore) ... */ }
-    function initIcons() { /* ... (as before) ... */ }
-    function renderAllUIComponents() { /* ... (as before) ... */ }
-    
-    // --- Main App Logic Function ---
-    function startAppLogic() {
-        if (domElements.mainAppInterface) domElements.mainAppInterface.style.display = 'flex';
-        
-        document.title = `Planificateur de Voyage: ${currentDestination}`; 
-        if (domElements.wordsDestinationName) domElements.wordsDestinationName.textContent = currentDestination;
-        
-        initializeDefaultDataArrays(); 
-        renderAllUIComponents();    
 
-        if (firebaseConfig && firebaseConfig.apiKey && firebaseConfig.projectId) { 
-            app = initializeFirebaseApp(firebaseConfig); 
-            auth = getAuth(app);
-            db = getFirestore(app);
 
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    userId = user.uid;
-                    console.log("Utilisateur anonyme connecté:", userId);
-                    loadTripDataFromFirestore(); 
-                } else {
-                    console.log("Tentative de connexion anonyme...");
-                    signInAnonymously(auth).catch((error) => {
-                        console.error("Erreur de connexion anonyme:", error);
-                        showErrorMessage("Impossible de se connecter au service de données. Les données locales par défaut sont utilisées.");
-                    });
-                }
-            });
-        } else {
-            showErrorMessage("Configuration Firebase manquante ou incomplète. L'application utilisera les données locales par défaut et ne pourra pas synchroniser.");
-            console.warn("Firebase config absente ou incomplète, initialisation des données par défaut locales.");
-        }
-        
-        initIcons(); 
-        setActiveScreen('checklistScreen'); 
-        
-        if (domElements.tabItems) {
-            domElements.tabItems.forEach(tab => tab.addEventListener('click', () => setActiveScreen(tab.dataset.screen)));
-        }
-        if (domElements.addItemButton) domElements.addItemButton.addEventListener('click', addChecklistItem);
-        if (domElements.newItemInput) domElements.newItemInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') addChecklistItem(); });
-        if (domElements.suggestTasksButton) domElements.suggestTasksButton.addEventListener('click', suggestNewTasks);
-        if (domElements.checklistSortButtonsContainer) {
-            domElements.checklistSortButtonsContainer.addEventListener('click', (e) => {
-                if (e.target.classList.contains('button')) {
-                    currentChecklistSort = e.target.dataset.sort;
-                    renderChecklistItems();
-                }
-            });
-        }
-        if (domElements.addCityButton) domElements.addCityButton.addEventListener('click', addCity);
-        if (domElements.newCityInput) domElements.newCityInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') addCity(); });
-        if (domElements.itineraryForm) domElements.itineraryForm.addEventListener('submit', handleItineraryFormSubmit);
-        if (domElements.cancelEditItineraryButton) domElements.cancelEditItineraryButton.addEventListener('click', resetItineraryForm);
-        if (domElements.eurInput) domElements.eurInput.addEventListener('input', convertCurrency);
-        if (domElements.jpyInput) domElements.jpyInput.addEventListener('input', convertCurrency);
-        if (domElements.suggestWordsButton) domElements.suggestWordsButton.addEventListener('click', suggestNewWords);
-        if (domElements.calculateJrPassButton) { 
-             domElements.calculateJrPassButton.addEventListener('click', calculateAndDisplayJrPassProfitability);
-        }
-        if (domElements.themeSelect) {
-            domElements.themeSelect.addEventListener('change', (e) => applyTheme(e.target.value));
-        }
-        if (domElements.closeCityModalButton) domElements.closeCityModalButton.onclick = closeEditCityModal;
-        if (domElements.saveCityModalButton) domElements.saveCityModalButton.onclick = saveCityDetails;
-        window.onclick = function(event) { 
-            if (domElements.editCityModal && event.target == domElements.editCityModal) {
-                closeEditCityModal();
-            }
-        }
-        updateConversionRateText();
-        resetItineraryForm(); 
-    };
-    
-    // --- Initialize App ---
-    document.addEventListener('DOMContentLoaded', () => {
-        domElements = {
+        const activityCategoryStyles = {
+            "Culturel": { color: "#8e44ad", icon: "🏛️" }, 
+            "Nature": { color: "#27ae60", icon: "🌳" },   
+            "Nourriture": { color: "#e67e22", icon: "🍜" },
+            "Shopping": { color: "#3498db", icon: "🛍️" }, 
+            "Monument": { color: "#7f8c8d", icon: "🗿" }, 
+            "Point d'intérêt": { color: "#f1c40f", icon: "📍" }, 
+            "Nourriture & Restaurants": { color: "#e74c3c", icon: "🍽️" }, 
+            "Suggestion": { color: "#95a5a6", icon: "💡" }, 
+            "Autre": { color: "#bdc3c7", icon: "➡️" } 
+        };
+
+
+        const domElements = {
             body: document.body,
-            mainAppInterface: document.getElementById('mainAppInterface'),
             screens: document.querySelectorAll('.screen'),
             tabItems: document.querySelectorAll('.tab-item'),
             checklistItemsContainer: document.getElementById('checklistItemsContainer'),
@@ -1256,7 +1016,6 @@
             usefulWordsListDiv: document.getElementById('usefulWordsList'),
             suggestWordsButton: document.getElementById('suggestWordsButton'),
             aiButtonSuggestWordIconPlaceholder: document.getElementById('aiButtonSuggestWordIconPlaceholder'),
-            wordsDestinationName: document.getElementById('wordsDestinationName'), 
             tabIconChecklist: document.getElementById('tabIconChecklist'),
             tabIconCities: document.getElementById('tabIconCities'),
             tabIconItinerary: document.getElementById('tabIconItinerary'),
@@ -1271,7 +1030,6 @@
             cancelEditItineraryButton: document.getElementById('cancelEditItineraryButton'),
             itineraryTimelineContainer: document.getElementById('itineraryTimelineContainer'),
             itineraryPathContainer: document.getElementById('itineraryPathContainer'),
-            itineraryDatesTitle: document.getElementById('itineraryDatesTitle'),
             calculateJrPassButton: document.getElementById('calculateJrPassButton'),
             jrPassResultContainer: document.getElementById('jrPassResultContainer'),
             themeSelect: document.getElementById('themeSelect'),
@@ -1284,15 +1042,1329 @@
             saveCityModalButton: document.getElementById('saveCityModalButton'),
         };
         
-        if ('speechSynthesis' in window) {
-            if (speechSynthesis.getVoices().length === 0) {
-                speechSynthesis.onvoiceschanged = loadVoices;
-            } else {
-                loadVoices(); 
+        function generateId(prefix = 'item') {
+            return `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        }
+
+        function saveData() {
+            try {
+                const dataToSave = {
+                    checklist: checklistItems,
+                    cities: citiesData,
+                    words: usefulWords,
+                    itinerary: itineraryData,
+                    theme: domElements.body.className 
+                };
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(dataToSave));
+            } catch (error) {
+                console.error("Erreur lors de la sauvegarde des données:", error);
+                showErrorMessage("Impossible de sauvegarder les données.");
             }
         }
-        startAppLogic(); 
-    });
+
+        function loadData() {
+            const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+            let currentTheme = 'theme-light'; // Default to light theme class name
+            if (savedData) {
+                try {
+                    const parsedData = JSON.parse(savedData);
+                    checklistItems = (parsedData.checklist || []).map(item => ({ ...item, id: item.id || generateId('checklist'), description: item.description || '', isExpanded: item.isExpanded || false, createdAt: item.createdAt || Date.now() }));
+                    citiesData = (parsedData.cities || []).map(city => ({ 
+                        ...city, 
+                        id: city.id || generateId('city'),
+                        color: city.color || getRandomColor(), 
+                        attractions: (city.attractions || []).map(attr => ({...attr, id: attr.id || generateId('attr'), description: attr.description || ''})) 
+                    }));
+                    usefulWords = (parsedData.words || []).map(word => ({ ...word, id: word.id || generateId('word') }));
+                    itineraryData = (parsedData.itinerary || []).map(stop => ({ ...stop, id: stop.id || generateId('itinerary')}));
+                    
+                    currentTheme = parsedData.theme || 'theme-light'; 
+
+                } catch (error) {
+                    console.error("Erreur lors du chargement des données:", error);
+                    initializeDefaultDataArrays();
+                }
+            } else {
+                 initializeDefaultDataArrays();
+            }
+            applyTheme(currentTheme); 
+            if (domElements.themeSelect) domElements.themeSelect.value = currentTheme.replace('theme-','');
+        }
+
+        function initializeDefaultDataArrays() {
+            checklistItems = [ 
+                { id: generateId('checklist'), text: 'Réserver les vols', completed: false, description: '', isExpanded: false, createdAt: Date.now() - 20000 }, 
+                { id: generateId('checklist'), text: 'Réserver les hébergements', completed: false, description: '', isExpanded: false, createdAt: Date.now() - 10000 }
+            ];
+            citiesData = [ 
+                { id: generateId('city'), name: 'Tokyo', color: getRandomColor(), isExpanded: false, attractions: [
+                    { id: generateId('attr'), text: 'Traversée de Shibuya', category: 'Point d\'intérêt', price: 'Gratuit', completed: false, description: 'Le passage piéton le plus fréquenté au monde.' },
+                    { id: generateId('attr'), text: 'Tour de Tokyo', category: 'Monument', price: '¥¥', completed: false, description: 'Tour d\'observation et de communication inspirée de la Tour Eiffel.' }
+                ]},
+                { id: generateId('city'), name: 'Kyoto', color: getRandomColor(), isExpanded: false, attractions: [
+                    { id: generateId('attr'), text: 'Kinkaku-ji (Pavillon d\'Or)', category: 'Culturel', price: '¥', completed: false, description: 'Célèbre temple Zen recouvert de feuilles d\'or.' }
+                ]}
+            ];
+            usefulWords = [ 
+                { id: generateId('word'), text: "Bonjour", translation: "こんにちは", isAISuggestion: false, lang: "ja-JP" },
+                { id: generateId('word'), text: "Merci", translation: "ありがとう", isAISuggestion: false, lang: "ja-JP" },
+                { id: generateId('word'), text: "S'il vous plaît", translation: "おねがいします", isAISuggestion: false, lang: "ja-JP" }
+            ];
+            itineraryData = [];
+        }
+        
+        function showLoadingMessage(message = "Chargement...") {
+            domElements.loadingMessage.textContent = message;
+            domElements.loadingMessage.style.display = 'block';
+            domElements.errorMessage.style.display = 'none';
+        }
+        function hideLoadingMessage() { domElements.loadingMessage.style.display = 'none'; }
+        function showErrorMessage(message = "Une erreur est survenue.") {
+            domElements.errorMessage.textContent = message;
+            domElements.errorMessage.style.display = 'block';
+            hideLoadingMessage();
+            setTimeout(() => { domElements.errorMessage.style.display = 'none'; }, 5000);
+        }
+
+        async function generateContentWithGemini(prompt) {
+            showLoadingMessage("L'IA réfléchit...");
+            const apiKey = "AIzaSyBu83wrvYvz9sQ3UU1E-3q4wokfQCcobuw";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+            try {
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (!response.ok) { 
+                    const errorData = await response.json(); 
+                    console.error("Gemini API Error Full Response:", errorData);
+                    throw new Error(errorData?.error?.message || `Erreur API Gemini (${response.status})`); 
+                }
+                const result = await response.json();
+                hideLoadingMessage();
+                if (result.candidates?.[0]?.content?.parts?.[0]?.text) { 
+                    return result.candidates[0].content.parts[0].text; 
+                }
+                console.warn("Gemini API - Réponse inattendue:", result);
+                throw new Error("Réponse IA inattendue ou vide.");
+            } catch (error) { 
+                console.error("Erreur fonction generateContentWithGemini:", error); 
+                showErrorMessage(error.message); 
+                hideLoadingMessage(); 
+                throw error; 
+            }
+        }
+
+        function setActiveScreen(screenId) {
+            domElements.screens.forEach(screen => screen.classList.toggle('active', screen.id === screenId));
+            domElements.tabItems.forEach(tab => tab.classList.toggle('active', tab.dataset.screen === screenId));
+            if (screenId === 'itineraryScreen') {
+                populateItineraryCitySelect();
+                renderItinerary();
+                resetItineraryForm(); 
+            }
+             if (screenId === 'infoScreen' && domElements.calculateJrPassButton) { 
+                domElements.calculateJrPassButton.addEventListener('click', calculateAndDisplayJrPassProfitability);
+            }
+            if (screenId === 'checklistScreen' && domElements.checklistSortButtonsContainer) {
+                 updateActiveSortButton();
+            }
+        }
+        domElements.tabItems.forEach(tab => tab.addEventListener('click', () => setActiveScreen(tab.dataset.screen)));
+
+        // --- Checklist Fonctions ---
+        function sortChecklistItems() {
+            switch (currentChecklistSort) {
+                case 'recent':
+                    checklistItems.sort((a, b) => b.createdAt - a.createdAt);
+                    break;
+                case 'oldest':
+                    checklistItems.sort((a, b) => a.createdAt - b.createdAt);
+                    break;
+                case 'incomplete':
+                    checklistItems.sort((a, b) => a.completed - b.completed || b.createdAt - a.createdAt);
+                    break;
+                case 'complete':
+                    checklistItems.sort((a, b) => b.completed - a.completed || b.createdAt - a.createdAt);
+                    break;
+                default:
+                    checklistItems.sort((a, b) => b.createdAt - a.createdAt); // Default to recent
+            }
+        }
+        
+        function updateActiveSortButton() {
+            document.querySelectorAll('#checklistSortButtons .button').forEach(button => {
+                button.classList.toggle('active', button.dataset.sort === currentChecklistSort);
+            });
+        }
+
+
+        function renderChecklistItems() {
+            if (!domElements.checklistItemsContainer) return;
+            sortChecklistItems(); // Sort before rendering
+            domElements.checklistItemsContainer.innerHTML = '';
+            checklistItems.forEach(item => {
+                const listItemDiv = document.createElement('div'); 
+                listItemDiv.className = 'list-item checklist-item';  
+                listItemDiv.dataset.id = item.id;
+
+                const mainContentDiv = document.createElement('div');
+                mainContentDiv.className = 'list-item-main-content';
+
+                const contentDiv = document.createElement('div'); 
+                contentDiv.className = 'checklist-item-content';
+                
+                const checkboxPlaceholder = document.createElement('span'); 
+                checkboxPlaceholder.className = 'checkbox-placeholder';
+                checkboxPlaceholder.innerHTML = item.completed ? icons.checkboxChecked : icons.checkboxEmpty;
+                checkboxPlaceholder.addEventListener('click', (e) => { 
+                    e.stopPropagation(); 
+                    toggleChecklistItemCompleted(item.id); 
+                });
+
+                const text = document.createElement('span'); 
+                text.className = 'checklist-item-text';
+                if (item.completed) text.classList.add('completed');
+                text.textContent = item.text;
+                
+                contentDiv.appendChild(checkboxPlaceholder); 
+                contentDiv.appendChild(text);
+                contentDiv.addEventListener('click', () => toggleChecklistItemExpansion(item.id));
+
+
+                const expandIcon = document.createElement('span');
+                expandIcon.className = 'expand-icon-placeholder';
+                expandIcon.innerHTML = item.isExpanded ? icons.chevronUp : icons.chevronDown;
+                expandIcon.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleChecklistItemExpansion(item.id);
+                });
+
+                const deleteBtnPlaceholder = document.createElement('span'); 
+                deleteBtnPlaceholder.className = 'delete-button-placeholder';
+                deleteBtnPlaceholder.innerHTML = icons.trash;
+                deleteBtnPlaceholder.addEventListener('click', (e) => { e.stopPropagation(); deleteChecklistItem(item.id); });
+
+                mainContentDiv.appendChild(contentDiv);
+                mainContentDiv.appendChild(expandIcon);
+                mainContentDiv.appendChild(deleteBtnPlaceholder);
+                
+                const descriptionArea = document.createElement('div');
+                descriptionArea.className = 'checklist-item-description-area';
+                if (item.isExpanded) descriptionArea.classList.add('expanded');
+                
+                const descriptionTextarea = document.createElement('textarea');
+                descriptionTextarea.className = 'textarea-input';
+                descriptionTextarea.placeholder = 'Ajouter une description ou des notes...';
+                descriptionTextarea.value = item.description || '';
+                descriptionTextarea.addEventListener('change', (e) => {
+                    updateChecklistItemDescription(item.id, e.target.value);
+                });
+                descriptionArea.appendChild(descriptionTextarea);
+
+                listItemDiv.appendChild(mainContentDiv);
+                listItemDiv.appendChild(descriptionArea);
+                domElements.checklistItemsContainer.appendChild(listItemDiv);
+            });
+            updateActiveSortButton();
+        }
+
+        function toggleChecklistItemCompleted(id) { 
+            const item = checklistItems.find(i => i.id === id); 
+            if (item) { 
+                item.completed = !item.completed; 
+                renderChecklistItems(); 
+                saveData(); 
+            }
+        }
+        function toggleChecklistItemExpansion(id) {
+            const item = checklistItems.find(i => i.id === id);
+            if (item) {
+                item.isExpanded = !item.isExpanded;
+                renderChecklistItems(); 
+                saveData();
+            }
+        }
+        function updateChecklistItemDescription(id, description) {
+            const item = checklistItems.find(i => i.id === id);
+            if (item) {
+                item.description = description;
+                saveData(); 
+            }
+        }
+
+        function deleteChecklistItem(id) { 
+            checklistItems = checklistItems.filter(i => i.id !== id); 
+            renderChecklistItems(); 
+            saveData(); 
+        }
+        function addChecklistItem() {
+            const text = domElements.newItemInput.value.trim(); if (text === '') return;
+            checklistItems.push({ id: generateId('checklist'), text: text, completed: false, description: '', isExpanded: false, createdAt: Date.now() });
+            domElements.newItemInput.value = ''; 
+            renderChecklistItems(); 
+            saveData();
+        }
+        domElements.addItemButton.addEventListener('click', addChecklistItem);
+        domElements.newItemInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') addChecklistItem(); });
+        
+        async function suggestNewTasks() {
+            const existingTasksText = checklistItems.map(item => `- ${item.text}`).join('\n');
+            const prompt = `Je planifie un voyage au Japon. Ma checklist actuelle:\n${existingTasksText}\n\nSuggère 3 tâches de préparation importantes et concises pour un voyage au Japon. Ne répète pas les tâches existantes. Une tâche par ligne, sans tiret ni numérotation.`;
+            try {
+                const suggestionsText = await generateContentWithGemini(prompt);
+                suggestionsText.split('\n').filter(task => task.trim() !== '').forEach(taskText => {
+                    if (!checklistItems.some(item => item.text.toLowerCase() === taskText.toLowerCase().trim())) {
+                        checklistItems.push({ id: generateId('checklist-ai'), text: taskText.trim(), completed: false, isAISuggestion: true, description: '', isExpanded: false, createdAt: Date.now() });
+                    }
+                });
+                renderChecklistItems(); saveData();
+            } catch (error) { console.error("Erreur suggestion tâches:", error); }
+        }
+        domElements.suggestTasksButton.addEventListener('click', suggestNewTasks);
+        if (domElements.checklistSortButtonsContainer) {
+            domElements.checklistSortButtonsContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('button')) {
+                    currentChecklistSort = e.target.dataset.sort;
+                    renderChecklistItems();
+                }
+            });
+        }
+
+
+        // --- Villes & Activités Fonctions ---
+        function openEditCityModal(cityId) {
+            const city = citiesData.find(c => c.id === cityId);
+            if (!city) return;
+            domElements.editingCityIdModalInput.value = city.id;
+            domElements.cityNameModalInput.value = city.name;
+            domElements.cityColorModalInputHidden.value = city.color || '#808080'; 
+            
+            domElements.cityColorPaletteDiv.innerHTML = '';
+            cityColorPalette.forEach(color => {
+                const colorDiv = document.createElement('div');
+                colorDiv.className = 'color-option';
+                colorDiv.style.backgroundColor = color.value;
+                colorDiv.dataset.colorValue = color.value;
+                colorDiv.title = color.name; 
+                if (color.value === (city.color || '#808080')) {
+                    colorDiv.classList.add('selected');
+                }
+                colorDiv.addEventListener('click', () => {
+                    document.querySelectorAll('#cityColorPalette .color-option').forEach(opt => opt.classList.remove('selected'));
+                    colorDiv.classList.add('selected');
+                    domElements.cityColorModalInputHidden.value = color.value;
+                });
+                domElements.cityColorPaletteDiv.appendChild(colorDiv);
+            });
+
+            domElements.editCityModal.style.display = 'block';
+        }
+
+        function closeEditCityModal() {
+            domElements.editCityModal.style.display = 'none';
+        }
+
+        function saveCityDetails() {
+            const cityId = domElements.editingCityIdModalInput.value;
+            const newName = domElements.cityNameModalInput.value.trim();
+            const newColor = domElements.cityColorModalInputHidden.value;
+
+            if (!newName) {
+                showErrorMessage("Le nom de la ville ne peut pas être vide.");
+                return;
+            }
+            const city = citiesData.find(c => c.id === cityId);
+            if (city) {
+                city.name = newName;
+                city.color = newColor || '#808080';
+                renderCities();
+                populateItineraryCitySelect();
+                renderItinerary(); 
+                saveData();
+            }
+            closeEditCityModal();
+        }
+
+
+        function renderCities() {
+            if (!domElements.citiesListContainer) return;
+            domElements.citiesListContainer.innerHTML = '';
+            citiesData.forEach(city => {
+                const cityCard = document.createElement('div'); cityCard.className = 'city-container'; cityCard.dataset.id = city.id;
+                const header = document.createElement('div'); header.className = 'city-header';
+                const headerMain = document.createElement('div'); headerMain.className = 'city-header-main';
+                
+                const colorIndicator = document.createElement('span');
+                colorIndicator.className = 'city-color-indicator';
+                colorIndicator.style.backgroundColor = city.color || 'var(--tertiary-bg-color)';
+                headerMain.appendChild(colorIndicator);
+                
+                const cityNameSpan = document.createElement('span');
+                cityNameSpan.className = 'city-name';
+                cityNameSpan.textContent = city.name;
+                headerMain.appendChild(cityNameSpan);
+
+                const expandIconPlaceholder = document.createElement('span'); expandIconPlaceholder.className = 'city-expand-icon-placeholder';
+                expandIconPlaceholder.innerHTML = city.isExpanded ? icons.minus : icons.plus;
+                headerMain.appendChild(expandIconPlaceholder);
+                headerMain.addEventListener('click', () => { city.isExpanded = !city.isExpanded; renderCities(); saveData(); });
+                
+                const cityActionsDiv = document.createElement('div'); cityActionsDiv.className = 'city-actions';
+                
+                const editCityButton = document.createElement('button');
+                editCityButton.className = 'button city-edit-icon-button city-action-button'; // Changed class
+                editCityButton.innerHTML = icons.edit;
+                editCityButton.title = "Modifier la ville";
+                editCityButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openEditCityModal(city.id);
+                });
+                cityActionsDiv.appendChild(editCityButton);
+
+                const stackedAiButtonsDiv = document.createElement('div'); // Wrapper for stacking
+                stackedAiButtonsDiv.className = 'stacked-ai-buttons';
+
+                const aiActivityButton = document.createElement('button'); 
+                aiActivityButton.className = 'button city-ai-activity-button city-action-button';
+                aiActivityButton.innerHTML = icons.sparkle + ' Idées Activités';
+                aiActivityButton.addEventListener('click', (e) => { e.stopPropagation(); suggestCityAttractions(city.id); });
+                stackedAiButtonsDiv.appendChild(aiActivityButton);
+                
+                const suggestFoodButton = document.createElement('button');
+                suggestFoodButton.className = 'button suggest-food-button city-action-button'; 
+                suggestFoodButton.innerHTML = icons.food + ' Restaurants';
+                suggestFoodButton.addEventListener('click', (e) => { e.stopPropagation(); suggestFoodForCity(city.id); });
+                stackedAiButtonsDiv.appendChild(suggestFoodButton);
+                
+                cityActionsDiv.appendChild(stackedAiButtonsDiv);
+
+
+                const deleteCityBtnPlaceholder = document.createElement('span'); deleteCityBtnPlaceholder.className = 'delete-button-placeholder delete-city-button-placeholder';
+                deleteCityBtnPlaceholder.innerHTML = icons.trash;
+                deleteCityBtnPlaceholder.addEventListener('click', (e) => { e.stopPropagation(); deleteCity(city.id); });
+                
+                cityActionsDiv.appendChild(deleteCityBtnPlaceholder);
+                header.appendChild(headerMain); header.appendChild(cityActionsDiv);
+                
+                const attractionsContainer = document.createElement('div'); attractionsContainer.className = 'attractions-container';
+                if (city.isExpanded) {
+                    attractionsContainer.classList.add('expanded');
+                    const attractionsByCategory = (city.attractions || []).reduce((acc, attraction) => {
+                        const category = attraction.category || 'Autres';
+                        if (!acc[category]) acc[category] = []; acc[category].push(attraction); return acc;
+                    }, {});
+
+                    Object.keys(attractionsByCategory).sort().forEach(category => {
+                        const categoryDiv = document.createElement('div'); categoryDiv.className = 'attraction-category';
+                        const categoryTitle = document.createElement('h3'); categoryTitle.className = 'attraction-category-title'; 
+                        
+                        const categoryStyle = activityCategoryStyles[category] || activityCategoryStyles["Autre"];
+                        const categoryColorIndicator = document.createElement('span');
+                        categoryColorIndicator.className = 'category-color-indicator';
+                        categoryColorIndicator.style.backgroundColor = categoryStyle.color;
+                        categoryTitle.appendChild(categoryColorIndicator);
+                        categoryTitle.appendChild(document.createTextNode(category)); 
+                        
+                        categoryDiv.appendChild(categoryTitle);
+                        
+                        attractionsByCategory[category].sort((a,b) => a.text.localeCompare(b.text)).forEach(attraction => {
+                            const attractionItemWrapper = document.createElement('div');
+                            attractionItemWrapper.className = 'attraction-item-wrapper';
+                            attractionItemWrapper.dataset.id = attraction.id;
+
+                            const checkboxPlaceholder = document.createElement('span'); 
+                            checkboxPlaceholder.className = 'attraction-checkbox-placeholder';
+                            checkboxPlaceholder.innerHTML = attraction.completed ? icons.checkboxChecked : icons.checkboxEmpty;
+                            checkboxPlaceholder.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                toggleCityAttractionCompleted(city.id, attraction.id);
+                            });
+                            
+                            const contentDiv = document.createElement('div');
+                            contentDiv.className = 'attraction-content';
+
+                            const textSpan = document.createElement('span'); 
+                            textSpan.className = 'attraction-text';
+                            if (attraction.completed) textSpan.classList.add('completed');
+                            if (attraction.isAISuggestion) textSpan.classList.add('ai-suggestion'); 
+                            textSpan.textContent = attraction.text.replace(/\*\*/g, ''); 
+                            textSpan.addEventListener('click', () => toggleCityAttractionCompleted(city.id, attraction.id));
+                            contentDiv.appendChild(textSpan);
+
+                            if (attraction.description) {
+                                const descriptionP = document.createElement('p');
+                                descriptionP.className = 'attraction-description';
+                                descriptionP.textContent = attraction.description;
+                                contentDiv.appendChild(descriptionP);
+                            }
+                            
+                            if (attraction.price) {
+                                const priceSpan = document.createElement('span'); 
+                                priceSpan.className = 'attraction-price';
+                                priceSpan.textContent = `(${attraction.price})`; 
+                                contentDiv.appendChild(priceSpan);
+                            }
+
+                            const mapButton = document.createElement('button');
+                            mapButton.className = 'map-link-button';
+                            mapButton.innerHTML = icons.mapMarker + ' Maps';
+                            mapButton.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                const query = encodeURIComponent(`${attraction.text.replace(/\*\*/g, '')}, ${city.name}, Japon`);
+                                window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank'); 
+                            });
+                            contentDiv.appendChild(mapButton);
+                            
+                            const actionsDiv = document.createElement('div');
+                            actionsDiv.className = 'attraction-actions';
+                            const deleteAttractionBtn = document.createElement('span'); 
+                            deleteAttractionBtn.className = 'delete-button-placeholder delete-attraction-button-placeholder';
+                            deleteAttractionBtn.innerHTML = icons.trash;
+                            deleteAttractionBtn.addEventListener('click', (e) => { e.stopPropagation(); deleteCityAttraction(city.id, attraction.id); });
+                            actionsDiv.appendChild(deleteAttractionBtn);
+
+                            attractionItemWrapper.appendChild(checkboxPlaceholder);
+                            attractionItemWrapper.appendChild(contentDiv);
+                            attractionItemWrapper.appendChild(actionsDiv);
+                            categoryDiv.appendChild(attractionItemWrapper);
+                        });
+                        attractionsContainer.appendChild(categoryDiv);
+                    });
+
+                    const addAttractionTitle = document.createElement('h4');
+                    addAttractionTitle.className = 'add-attraction-section-title';
+                    addAttractionTitle.textContent = 'Ajouter une nouvelle activité';
+                    attractionsContainer.appendChild(addAttractionTitle);
+                    
+                    const addAttractionDiv = document.createElement('div');
+                    addAttractionDiv.className = 'add-attraction-form';
+                    addAttractionDiv.innerHTML = `
+                        <input type="text" class="text-input new-attraction-text-${city.id}" placeholder="Nom de l'activité...">
+                        <textarea class="textarea-input new-attraction-description-${city.id}" placeholder="Courte description..."></textarea>
+                        <input type="text" class="text-input new-attraction-category-${city.id}" placeholder="Catégorie (ex: Culturel)...">
+                        <input type="text" class="text-input new-attraction-price-${city.id}" placeholder="Prix (ex: ¥¥, Gratuit)...">
+                    `;
+                    const addManualActivityBtn = document.createElement('button');
+                    addManualActivityBtn.className = 'button add-button small-button';
+                    addManualActivityBtn.textContent = 'Ajouter Activité';
+                    addManualActivityBtn.addEventListener('click', () => addManualActivityToCity(city.id));
+                    addAttractionDiv.appendChild(addManualActivityBtn);
+                    attractionsContainer.appendChild(addAttractionDiv);
+                }
+                cityCard.appendChild(header); cityCard.appendChild(attractionsContainer);
+                domElements.citiesListContainer.appendChild(cityCard);
+            });
+        }
+        
+        function addManualActivityToCity(cityId) {
+            const city = citiesData.find(c => c.id === cityId);
+            if (!city) return;
+
+            const textInput = document.querySelector(`.new-attraction-text-${cityId}`);
+            const descriptionInput = document.querySelector(`.new-attraction-description-${cityId}`);
+            const categoryInput = document.querySelector(`.new-attraction-category-${cityId}`);
+            const priceInput = document.querySelector(`.new-attraction-price-${cityId}`);
+
+            const text = textInput.value.trim();
+            const description = descriptionInput.value.trim();
+            const category = categoryInput.value.trim() || 'Autre';
+            const price = priceInput.value.trim() || 'N/A';
+
+            if (text === '') {
+                showErrorMessage("Le nom de l'activité est requis.");
+                return;
+            }
+
+            if (!city.attractions) city.attractions = [];
+            city.attractions.push({
+                id: generateId('attr-manual'),
+                text,
+                description,
+                category,
+                price,
+                completed: false,
+                isAISuggestion: false
+            });
+
+            textInput.value = '';
+            descriptionInput.value = '';
+            categoryInput.value = '';
+            priceInput.value = '';
+            renderCities();
+            saveData();
+        }
+
+        function getRandomColor() {
+            return cityColorPalette[Math.floor(Math.random() * cityColorPalette.length)].value;
+        }
+
+
+        function addCity() { 
+            const cityName = domElements.newCityInput.value.trim();
+            if (cityName === '') { showErrorMessage("Le nom de la ville est requis."); return; }
+            if (citiesData.some(city => city.name.toLowerCase() === cityName.toLowerCase())) { showErrorMessage("Cette ville existe déjà."); return; }
+            citiesData.push({ id: generateId('city'), name: cityName, color: getRandomColor(), isExpanded: false, attractions: [] });
+            domElements.newCityInput.value = ''; 
+            renderCities(); 
+            populateItineraryCitySelect(); 
+            saveData();
+        }
+        domElements.addCityButton.addEventListener('click', addCity);
+        domElements.newCityInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') addCity(); });
+        
+        function deleteCity(cityId) { 
+            citiesData = citiesData.filter(city => city.id !== cityId); 
+            itineraryData = itineraryData.filter(stop => stop.cityId !== cityId);
+            renderCities(); 
+            renderItinerary();
+            populateItineraryCitySelect();
+            saveData(); 
+        }
+        
+        function toggleCityAttractionCompleted(cityId, attractionId) {
+             const city = citiesData.find(c => c.id === cityId);
+            if (city) { 
+                const attraction = (city.attractions || []).find(a => a.id === attractionId); 
+                if (attraction) { 
+                    attraction.completed = !attraction.completed; 
+                    renderCities(); 
+                    saveData(); 
+                }
+            }
+        }
+        function deleteCityAttraction(cityId, attractionId) {
+            const city = citiesData.find(c => c.id === cityId);
+            if (city) { 
+                city.attractions = (city.attractions || []).filter(a => a.id !== attractionId); 
+                renderCities(); 
+                saveData(); 
+            }
+        }
+        async function suggestCityAttractions(cityId) { 
+            const city = citiesData.find(c => c.id === cityId); if (!city) return;
+
+            let durationInCity = 3; 
+            const itineraryStop = itineraryData.find(stop => stop.cityId === cityId);
+            if (itineraryStop) {
+                durationInCity = parseInt(itineraryStop.durationNights) + 1; 
+            }
+            
+            let numberOfSuggestions = 3; 
+            if (durationInCity <= 2) numberOfSuggestions = 2;
+            else if (durationInCity >= 5) numberOfSuggestions = 4;
+
+
+            const existingAttractionsText = (city.attractions || []).filter(attr => attr.category !== "Nourriture & Restaurants").map(attr => `- ${attr.text}`).join('\n');
+            const prompt = `Pour la ville de ${city.name} au Japon, où je prévois de rester environ ${durationInCity} jours, suggère ${numberOfSuggestions} activités ou lieux touristiques intéressants (pas de restaurants ou nourriture ici), en plus de ceux-ci (s'il y en a):\n${existingAttractionsText}\n\nPour chaque suggestion, donne le nom, une catégorie (ex: Culturel, Nature, Shopping, Point d'intérêt, Monument), une estimation de prix (Gratuit, ¥, ¥¥, ¥¥¥, ou N/A), et une très courte description (max 15 mots).
+Ne répète pas les attractions existantes. Réponds uniquement avec les suggestions au format exact (une par ligne): NOM_ATTRACTION;CATEGORIE;PRIX;DESCRIPTION_COURTE. N'utilise pas de formatage markdown comme des astérisques.
+Exemple: Temple Senso-ji;Culturel;Gratuit;Plus ancien temple de Tokyo.`;
+            try {
+                const suggestionsText = await generateContentWithGemini(prompt);
+                if (!city.attractions) city.attractions = [];
+                suggestionsText.split('\n').filter(attr => attr.trim() !== '' && attr.includes(';')).forEach(rawAttrText => {
+                    const parts = rawAttrText.split(';');
+                    if (parts.length >= 4) { 
+                        const text = parts[0]?.trim().replace(/\*\*/g, ''); 
+                        const category = parts[1]?.trim() || "Suggestion";
+                        const price = parts[2]?.trim() || "N/A";
+                        const description = parts[3]?.trim() || "";
+                        if (text && !city.attractions.some(ea => ea.text.toLowerCase().includes(text.toLowerCase()))) {
+                            city.attractions.push({ id: generateId('attr-ai'), text, category, price, description, completed: false, isAISuggestion: true });
+                        }
+                    }
+                });
+                if (!city.isExpanded) city.isExpanded = true; 
+                renderCities(); 
+                saveData();
+            } catch (error) { console.error(`Erreur suggestion pour ${city.name}:`, error); }
+        }
+
+        async function suggestFoodForCity(cityId) {
+            const city = citiesData.find(c => c.id === cityId); if (!city) return;
+            const existingFoodText = (city.attractions || []).filter(attr => attr.category === "Nourriture & Restaurants").map(attr => `- ${attr.text}`).join('\n');
+            const prompt = `Pour la ville de ${city.name} au Japon, suggère 2-3 spécialités culinaires locales ou des types de restaurants à essayer. Pour chaque suggestion, donne le nom et une brève description (max 10 mots). Ne répète pas ce qui existe déjà :\n${existingFoodText}\nRéponds uniquement avec les suggestions au format : NOM_SPECIALITE_OU_TYPE_RESTAURANT;DESCRIPTION_COURTE. N'utilise pas de formatage markdown comme des astérisques.`;
+            
+            try {
+                const suggestionsText = await generateContentWithGemini(prompt);
+                if (!city.attractions) city.attractions = [];
+                suggestionsText.split('\n').filter(line => line.trim() !== '' && line.includes(';')).forEach(rawLine => {
+                    const parts = rawLine.split(';');
+                    if (parts.length >= 2) {
+                        const text = parts[0]?.trim().replace(/\*\*/g, ''); 
+                        const description = parts[1]?.trim() || "";
+                        if (text && !city.attractions.some(ea => ea.text.toLowerCase().includes(text.toLowerCase()) && ea.category === "Nourriture & Restaurants")) {
+                            city.attractions.push({
+                                id: generateId('food-ai'),
+                                text,
+                                category: "Nourriture & Restaurants",
+                                price: "Variable", 
+                                description,
+                                completed: false,
+                                isAISuggestion: true
+                            });
+                        }
+                    }
+                });
+                if (!city.isExpanded) city.isExpanded = true;
+                renderCities();
+                saveData();
+            } catch (error) { console.error(`Erreur suggestion nourriture pour ${city.name}:`, error); }
+        }
+        
+        // --- Itinerary Functions ---
+        function renderItineraryPath() {
+            if (!domElements.itineraryPathContainer) return;
+            domElements.itineraryPathContainer.innerHTML = '';
+            const sortedItinerary = [...itineraryData].sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+
+            if (sortedItinerary.length === 0) {
+                domElements.itineraryPathContainer.innerHTML = '<p style="text-align:center; font-size:14px; color: var(--text-color-tertiary);">Aucune étape dans l\'itinéraire.</p>';
+                return;
+            }
+            
+            sortedItinerary.forEach((stop, index) => {
+                const city = citiesData.find(c => c.id === stop.cityId);
+                if (!city) return;
+
+                const pathItem = document.createElement('span');
+                pathItem.className = 'itinerary-path-item';
+                pathItem.style.backgroundColor = city.color || 'var(--tertiary-bg-color)';
+                pathItem.textContent = city.name;
+                domElements.itineraryPathContainer.appendChild(pathItem);
+
+                if (index < sortedItinerary.length - 1) {
+                    const arrowSpan = document.createElement('span');
+                    arrowSpan.innerHTML = icons.route; 
+                    arrowSpan.style.color = 'var(--text-color-tertiary)';
+                    arrowSpan.style.margin = '0 5px';
+                    domElements.itineraryPathContainer.appendChild(arrowSpan);
+                }
+            });
+        }
+
+
+        function populateItineraryCitySelect() {
+            if (!domElements.itineraryCitySelect) return;
+            const currentSelection = domElements.itineraryCitySelect.value;
+            domElements.itineraryCitySelect.innerHTML = '<option value="">-- Choisir une ville --</option>';
+            citiesData.forEach(city => {
+                const option = document.createElement('option');
+                option.value = city.id;
+                option.textContent = city.name;
+                if (city.id === currentSelection) option.selected = true;
+                domElements.itineraryCitySelect.appendChild(option);
+            });
+        }
+        
+        function parseGeminiCostResponse(responseText) {
+            if (!responseText) return 0;
+            const cleanedText = responseText.replace(/[¥円￥,]/g, '').trim();
+            const rangeMatch = cleanedText.match(/^(\d+)\s*-\s*(\d+)$/);
+            if (rangeMatch) {
+                const num1 = parseInt(rangeMatch[1], 10);
+                const num2 = parseInt(rangeMatch[2], 10);
+                if (!isNaN(num1) && !isNaN(num2)) {
+                    return Math.round((num1 + num2) / 2);
+                }
+            }
+            const singleNumberMatch = cleanedText.match(/^(\d+)$/);
+            if (singleNumberMatch) {
+                const num = parseInt(singleNumberMatch[1], 10);
+                if (!isNaN(num)) return num;
+            }
+            const anyNumberMatch = cleanedText.match(/\d+/);
+            if (anyNumberMatch) {
+                 const num = parseInt(anyNumberMatch[0], 10);
+                 if (!isNaN(num)) return num;
+            }
+            console.warn("Could not parse cost from Gemini response:", responseText);
+            return 0; 
+        }
+
+
+        async function getTrainCostEstimateAI(city1Name, city2Name, elementToUpdate) { 
+            if (city1Name === city2Name) return 0; 
+
+            const cacheKey = `trainCost-${[city1Name, city2Name].sort().join('-')}`;
+            const cachedItem = localStorage.getItem(cacheKey);
+            if (cachedItem) {
+                const {cost, timestamp} = JSON.parse(cachedItem);
+                if (Date.now() - timestamp < 24 * 60 * 60 * 1000) { 
+                    if (elementToUpdate) elementToUpdate.textContent = `Train depuis ${city1Name}: env. ¥${cost.toLocaleString()}`;
+                    return cost;
+                }
+            }
+
+            const prompt = `Estime le coût moyen en Yens d'un billet de train pour un adulte entre ${city1Name} et ${city2Name} au Japon. Si c'est un trajet typiquement fait en Shinkansen, base-toi sur cela. Réponds uniquement avec un nombre (par exemple, 14500) ou une fourchette de nombres (par exemple, 12000-15000). N'ajoute aucun texte explicatif.`;
+            try {
+                if (elementToUpdate) elementToUpdate.textContent = `Train depuis ${city1Name}: Estimation...`;
+                
+                const responseText = await generateContentWithGemini(prompt); 
+                const cost = parseGeminiCostResponse(responseText);
+                
+                if (cost > 0) {
+                    localStorage.setItem(cacheKey, JSON.stringify({cost, timestamp: Date.now()})); 
+                }
+                 if (elementToUpdate) elementToUpdate.textContent = cost > 0 ? `Train depuis ${city1Name}: env. ¥${cost.toLocaleString()}` : `Train depuis ${city1Name}: Coût non estimé`;
+                return cost;
+            } catch (error) {
+                console.error(`Erreur d'estimation du coût du train pour ${city1Name} - ${city2Name}:`, error);
+                if (elementToUpdate) elementToUpdate.textContent = `Train depuis ${city1Name}: Erreur estim.`;
+                return 0; 
+            }
+        }
+        
+        async function renderItinerary() { 
+            if (!domElements.itineraryTimelineContainer) return;
+            renderItineraryPath(); 
+            domElements.itineraryTimelineContainer.innerHTML = '';
+            
+            const sortedItinerary = [...itineraryData].sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+
+            if (sortedItinerary.length === 0) {
+                domElements.itineraryTimelineContainer.innerHTML = '<p style="text-align:center; color: var(--text-color-tertiary);">Commencez à planifier votre itinéraire !</p>';
+                return;
+            }
+
+            for (let index = 0; index < sortedItinerary.length; index++) { 
+                const stop = sortedItinerary[index];
+                const city = citiesData.find(c => c.id === stop.cityId);
+                if (!city) continue; 
+
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'timeline-item';
+
+                const reorderDiv = document.createElement('div'); 
+                reorderDiv.className = 'reorder-buttons';
+                if (index > 0) { 
+                    const upButton = document.createElement('button');
+                    upButton.innerHTML = icons.arrowUp;
+                    upButton.title = "Monter l'étape";
+                    upButton.addEventListener('click', () => moveItineraryStop(index, index - 1));
+                    reorderDiv.appendChild(upButton);
+                }
+                if (index < sortedItinerary.length - 1) { 
+                     const downButton = document.createElement('button');
+                    downButton.innerHTML = icons.chevronDown; 
+                    downButton.title = "Descendre l'étape";
+                    downButton.addEventListener('click', () => moveItineraryStop(index, index + 1));
+                    reorderDiv.appendChild(downButton);
+                }
+                itemDiv.appendChild(reorderDiv); 
+
+                const dotDiv = document.createElement('div');
+                dotDiv.className = 'timeline-dot';
+                dotDiv.style.backgroundColor = city.color || 'var(--accent-color)'; 
+                itemDiv.appendChild(dotDiv);
+
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'timeline-item-content';
+
+                const cityP = document.createElement('p');
+                cityP.className = 'timeline-city';
+                cityP.textContent = city.name;
+                cityP.style.color = city.color || 'var(--text-color-primary)'; 
+                contentDiv.appendChild(cityP);
+
+                const startDate = new Date(stop.startDate + 'T00:00:00'); 
+                const endDate = new Date(startDate);
+                endDate.setDate(startDate.getDate() + parseInt(stop.durationNights));
+                
+                const datesP = document.createElement('p');
+                datesP.className = 'timeline-dates';
+                datesP.innerHTML = `${icons.calendar} ${startDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} - ${endDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+                contentDiv.appendChild(datesP);
+                
+                const durationP = document.createElement('p');
+                durationP.className = 'timeline-duration';
+                durationP.textContent = `${stop.durationNights} nuit(s)`;
+                contentDiv.appendChild(durationP);
+
+                if (stop.notes) {
+                    const notesP = document.createElement('p');
+                    notesP.className = 'timeline-notes';
+                    notesP.textContent = `Notes: ${stop.notes}`;
+                    contentDiv.appendChild(notesP);
+                }
+
+                if (index > 0) {
+                    const prevStop = sortedItinerary[index - 1];
+                    const prevCity = citiesData.find(c => c.id === prevStop.cityId);
+                    if (prevCity && prevCity.name !== city.name) {
+                        const trainCostP = document.createElement('p');
+                        trainCostP.className = 'timeline-train-cost';
+                        trainCostP.id = `trainCost-${prevCity.id}-${city.id}-${stop.id}`; 
+                        trainCostP.textContent = `Train depuis ${prevCity.name}: Estimation...`;
+                        contentDiv.appendChild(trainCostP);
+                        getTrainCostEstimateAI(prevCity.name, city.name, trainCostP); 
+                    }
+                }
+                
+                const actionsDiv = document.createElement('div');
+                actionsDiv.className = 'timeline-item-actions';
+                
+                const editStopBtn = document.createElement('button');
+                editStopBtn.className = 'button small-button secondary-button';
+                editStopBtn.innerHTML = icons.edit + " Modifier";
+                editStopBtn.addEventListener('click', () => populateItineraryFormForEdit(stop.id));
+                actionsDiv.appendChild(editStopBtn);
+
+                const deleteStopBtn = document.createElement('button');
+                deleteStopBtn.className = 'button small-button destructive-color'; 
+                deleteStopBtn.style.backgroundColor = 'var(--destructive-color)';
+                deleteStopBtn.innerHTML = icons.trash + " Supprimer";
+                deleteStopBtn.addEventListener('click', () => deleteItineraryStop(stop.id));
+                actionsDiv.appendChild(deleteStopBtn);
+                contentDiv.appendChild(actionsDiv);
+
+                itemDiv.appendChild(contentDiv);
+                domElements.itineraryTimelineContainer.appendChild(itemDiv);
+            }
+        }
+
+        function moveItineraryStop(oldIndexSorted, newIndexSorted) {
+            const sortedItinerary = [...itineraryData].sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+            const itemToMoveId = sortedItinerary[oldIndexSorted].id;
+            
+            const itemToMoveOriginalIndex = itineraryData.findIndex(item => item.id === itemToMoveId);
+            if (itemToMoveOriginalIndex === -1) return;
+
+            const item = itineraryData.splice(itemToMoveOriginalIndex, 1)[0]; 
+            
+            let newOriginalIndex = 0;
+            if (newIndexSorted < oldIndexSorted) { 
+                if (newIndexSorted === 0) {
+                    newOriginalIndex = 0;
+                } else {
+                    const itemBeforeTargetId = sortedItinerary[newIndexSorted -1].id;
+                    newOriginalIndex = itineraryData.findIndex(it => it.id === itemBeforeTargetId) + 1;
+                }
+            } else { 
+                 if (newIndexSorted >= itineraryData.length) { 
+                    newOriginalIndex = itineraryData.length;
+                 } else {
+                    const itemAtTargetId = sortedItinerary[newIndexSorted].id; 
+                    newOriginalIndex = itineraryData.findIndex(it => it.id === itemAtTargetId);
+                 }
+            }
+            itineraryData.splice(newOriginalIndex, 0, item); 
+
+            renderItinerary();
+            saveData();
+        }
+        
+        function populateItineraryFormForEdit(stopId) {
+            const stopToEdit = itineraryData.find(stop => stop.id === stopId);
+            if (!stopToEdit) return;
+
+            editingItineraryStopId = stopId;
+            domElements.editingItineraryStopIdInput.value = stopId;
+            domElements.itineraryCitySelect.value = stopToEdit.cityId;
+            domElements.itineraryStartDateInput.value = stopToEdit.startDate;
+            domElements.itineraryDurationNightsInput.value = stopToEdit.durationNights;
+            domElements.itineraryNotesInput.value = stopToEdit.notes || '';
+            
+            domElements.addItineraryStopButton.textContent = 'Modifier Étape';
+            domElements.cancelEditItineraryButton.style.display = 'inline-flex';
+        }
+
+        function resetItineraryForm() {
+            editingItineraryStopId = null;
+            domElements.editingItineraryStopIdInput.value = '';
+            domElements.itineraryForm.reset();
+            
+            const sortedItinerary = [...itineraryData].sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+            let nextStartDateStr = TRIP_START_DATE;
+            if(sortedItinerary.length > 0) {
+                const lastStop = sortedItinerary[sortedItinerary.length -1];
+                const lastStopEndDate = new Date(lastStop.startDate + "T00:00:00"); 
+                lastStopEndDate.setDate(lastStopEndDate.getDate() + parseInt(lastStop.durationNights));
+                
+                const tripEndDateObj = new Date(TRIP_END_DATE + "T00:00:00");
+                if (lastStopEndDate <= tripEndDateObj) { 
+                    nextStartDateStr = lastStopEndDate.toISOString().split('T')[0];
+                } else {
+                    nextStartDateStr = TRIP_END_DATE; 
+                }
+            }
+            domElements.itineraryStartDateInput.value = nextStartDateStr;
+
+
+            domElements.addItineraryStopButton.textContent = 'Ajouter Étape';
+            domElements.cancelEditItineraryButton.style.display = 'none';
+            populateItineraryCitySelect(); 
+        }
+
+
+        function handleItineraryFormSubmit(event) {
+            event.preventDefault();
+            const cityId = domElements.itineraryCitySelect.value;
+            const startDateStr = domElements.itineraryStartDateInput.value;
+            const durationNights = parseInt(domElements.itineraryDurationNightsInput.value);
+            const notes = domElements.itineraryNotesInput.value.trim();
+
+            if (!cityId || !startDateStr || isNaN(durationNights) || durationNights < 1) {
+                showErrorMessage("Veuillez remplir tous les champs requis pour l'étape.");
+                return;
+            }
+            
+            const newStopDate = new Date(startDateStr + 'T00:00:00'); 
+            const tripStartDateObj = new Date(TRIP_START_DATE + 'T00:00:00');
+            const tripEndDateObj = new Date(TRIP_END_DATE + 'T00:00:00');
+            
+            const tempEndDate = new Date(newStopDate);
+            tempEndDate.setDate(newStopDate.getDate() + durationNights);
+
+            if (newStopDate < tripStartDateObj || tempEndDate > new Date(tripEndDateObj.getTime() + (24*60*60*1000))) { 
+                 showErrorMessage(`L'étape doit être entre le ${tripStartDateObj.toLocaleDateString('fr-FR')} et le ${tripEndDateObj.toLocaleDateString('fr-FR')}.`);
+                 return;
+            }
+            
+            const otherStops = itineraryData.filter(s => s.id !== editingItineraryStopId); 
+            for (const stop of otherStops) {
+                const existingStartDate = new Date(stop.startDate + 'T00:00:00');
+                const existingEndDate = new Date(existingStartDate);
+                existingEndDate.setDate(existingStartDate.getDate() + parseInt(stop.durationNights));
+
+                if (newStopDate < existingEndDate && tempEndDate > existingStartDate) {
+                    showErrorMessage(`Cette période chevauche une étape existante pour ${citiesData.find(c=>c.id === stop.cityId)?.name || 'une ville'} (${existingStartDate.toLocaleDateString('fr-FR')} - ${existingEndDate.toLocaleDateString('fr-FR')}).`);
+                    return;
+                }
+            }
+
+
+            if (editingItineraryStopId) { 
+                const stopIndex = itineraryData.findIndex(stop => stop.id === editingItineraryStopId);
+                if (stopIndex > -1) {
+                    itineraryData[stopIndex] = { ...itineraryData[stopIndex], cityId, startDate: startDateStr, durationNights, notes };
+                }
+            } else { 
+                itineraryData.push({
+                    id: generateId('itinerary'),
+                    cityId,
+                    startDate: startDateStr, 
+                    durationNights,
+                    notes
+                });
+            }
+            
+            renderItinerary();
+            saveData();
+            resetItineraryForm(); 
+        }
+        
+        function deleteItineraryStop(stopId) {
+            itineraryData = itineraryData.filter(stop => stop.id !== stopId);
+            renderItinerary();
+            saveData();
+        }
+
+
+        if (domElements.itineraryForm) {
+            domElements.itineraryForm.addEventListener('submit', handleItineraryFormSubmit);
+        }
+        if (domElements.cancelEditItineraryButton) {
+            domElements.cancelEditItineraryButton.addEventListener('click', resetItineraryForm);
+        }
+        
+        // --- JR Pass Calculator ---
+        async function calculateAndDisplayJrPassProfitability() { 
+            if (!domElements.jrPassResultContainer) return;
+
+            const sortedItinerary = [...itineraryData].sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+            if (sortedItinerary.length < 2) {
+                domElements.jrPassResultContainer.innerHTML = "<p>Veuillez ajouter au moins deux étapes à votre itinéraire pour calculer la rentabilité du JR Pass.</p>";
+                domElements.jrPassResultContainer.style.display = 'block';
+                return;
+            }
+            
+            showLoadingMessage("Calcul des coûts de train..."); 
+
+            let totalIndividualCost = 0;
+            const costPromises = [];
+
+            for (let i = 0; i < sortedItinerary.length - 1; i++) {
+                const city1Data = citiesData.find(c => c.id === sortedItinerary[i].cityId);
+                const city2Data = citiesData.find(c => c.id === sortedItinerary[i+1].cityId);
+                if (city1Data && city2Data && city1Data.name !== city2Data.name) { 
+                    costPromises.push(getTrainCostEstimateAI(city1Data.name, city2Data.name, null)); 
+                } else {
+                    costPromises.push(Promise.resolve(0)); 
+                }
+            }
+            
+            try {
+                const individualCosts = await Promise.all(costPromises);
+                totalIndividualCost = individualCosts.reduce((sum, cost) => sum + cost, 0);
+                hideLoadingMessage(); 
+            } catch (error) {
+                hideLoadingMessage();
+                showErrorMessage("Erreur lors de l'estimation des coûts de train.");
+                console.error("Error fetching all train costs for JR Pass:", error);
+                return;
+            }
+
+            let resultsHTML = `<p><strong>Coût total estimé des billets individuels :</strong> ¥${totalIndividualCost.toLocaleString()}</p>`;
+            resultsHTML += `<p><strong>Comparaison avec les JR Pass (prix affichés ci-dessus) :</strong></p><ul>`;
+
+            let bestPassOption = { days: 0, savings: -Infinity, price: Infinity };
+            
+            const firstDay = new Date(sortedItinerary[0].startDate + "T00:00:00");
+            const lastStop = sortedItinerary[sortedItinerary.length - 1];
+            const lastDayItinerary = new Date(lastStop.startDate + "T00:00:00");
+            lastDayItinerary.setDate(lastDayItinerary.getDate() + parseInt(lastStop.durationNights));
+            const mainTravelDuration = Math.ceil((lastDayItinerary - firstDay) / (1000 * 60 * 60 * 24)) +1; 
+
+
+            Object.entries(jrPassPrices).forEach(([days, price]) => {
+                const difference = totalIndividualCost - price;
+                const isProfitable = difference > 0;
+                resultsHTML += `<li>JR Pass ${days} jours : ¥${price.toLocaleString()}. 
+                                ${isProfitable ? '<strong style="color:var(--highlight-color);">Rentable</strong>' : 'Non rentable'}. 
+                                ${isProfitable ? 'Économie estimée' : 'Surcoût'}: ¥${Math.abs(difference).toLocaleString()}
+                               </li>`;
+                if (isProfitable && difference > bestPassOption.savings) {
+                    bestPassOption = {days: parseInt(days), savings: difference, price: price};
+                } else if (!isProfitable && price < bestPassOption.price && bestPassOption.savings === -Infinity) {
+                    bestPassOption = {days: parseInt(days), savings: difference, price: price};
+                }
+            });
+            resultsHTML += `</ul>`;
+
+            let recommendationText = "";
+            if (bestPassOption.savings > 0) { 
+                recommendationText = `Un JR Pass de ${bestPassOption.days} jours semble être l'option la plus rentable, économisant environ ¥${bestPassOption.savings.toLocaleString()}.`;
+                if (mainTravelDuration > bestPassOption.days) {
+                    recommendationText += ` Votre période de voyage principale est d'environ ${mainTravelDuration} jours. Concentrez vos trajets les plus chers pendant la validité du pass de ${bestPassOption.days} jours.`;
+                } else if (mainTravelDuration < bestPassOption.days && bestPassOption.days > 7) {
+                    let shorterProfitablePass = null;
+                    Object.entries(jrPassPrices).forEach(([daysStr, price]) => {
+                        const days = parseInt(daysStr);
+                        if (days < bestPassOption.days && (totalIndividualCost - price) > 0) {
+                            if (!shorterProfitablePass || (totalIndividualCost - price) > (totalIndividualCost - jrPassPrices[shorterProfitablePass])) {
+                                shorterProfitablePass = days;
+                            }
+                        }
+                    });
+                    if (shorterProfitablePass && mainTravelDuration <= shorterProfitablePass) {
+                         recommendationText = `Un JR Pass de ${shorterProfitablePass} jours pourrait être suffisant et rentable pour votre voyage de ${mainTravelDuration} jours, économisant environ ¥${(totalIndividualCost - jrPassPrices[shorterProfitablePass]).toLocaleString()}.`;
+                    }
+                }
+                 resultsHTML += `<p class="recommendation profitable">${recommendationText}</p>`;
+            } else { 
+                recommendationText = "D'après cet itinéraire, acheter des billets individuels semble plus économique.";
+                if (totalIndividualCost > 0 && bestPassOption.price !== Infinity) { 
+                     recommendationText += ` Le pass le moins cher (${bestPassOption.days} jours à ¥${bestPassOption.price.toLocaleString()}) entraînerait un surcoût d'environ ¥${Math.abs(bestPassOption.savings).toLocaleString()}.`;
+                }
+                resultsHTML += `<p class="recommendation not-profitable">${recommendationText}</p>`;
+            }
+            
+            resultsHTML += `<p class="info-small-text" style="margin-top:10px;">Note : Ces calculs sont basés sur des estimations de prix pour les trajets principaux. Le JR Pass peut aussi couvrir certains trajets locaux sur les lignes JR, ce qui pourrait augmenter sa valeur.</p>`;
+            
+            domElements.jrPassResultContainer.innerHTML = resultsHTML;
+            domElements.jrPassResultContainer.style.display = 'block';
+        }
+
+
+        // --- Info Screen Fonctions ---
+        function updateConversionRateText() { if(domElements.conversionRateText) domElements.conversionRateText.textContent = `Taux : 1 EUR ≈ ${currentExchangeRate} JPY`; }
+        function convertCurrency() {
+            const eurValue = parseFloat(domElements.eurInput.value);
+            const jpyValue = parseFloat(domElements.jpyInput.value);
+            if (document.activeElement === domElements.eurInput && !isNaN(eurValue)) domElements.jpyInput.value = (eurValue * currentExchangeRate).toFixed(0);
+            else if (document.activeElement === domElements.jpyInput && !isNaN(jpyValue)) domElements.eurInput.value = (jpyValue / currentExchangeRate).toFixed(2);
+        }
+        if(domElements.eurInput) domElements.eurInput.addEventListener('input', convertCurrency);
+        if(domElements.jpyInput) domElements.jpyInput.addEventListener('input', convertCurrency);
+
+        function loadVoices() {
+            try {
+                const voices = speechSynthesis.getVoices();
+                if (voices.length > 0) {
+                    japaneseVoice = voices.find(voice => voice.lang === 'ja-JP');
+                    if (!japaneseVoice) {
+                        japaneseVoice = voices.find(voice => voice.lang.startsWith('ja'));
+                    }
+                    console.log("Voix japonaises disponibles:", voices.filter(v => v.lang.startsWith('ja')));
+                    console.log("Voix japonaise sélectionnée:", japaneseVoice ? japaneseVoice.name : "Aucune voix ja-JP ou ja* trouvée.");
+                } else {
+                    console.log("Liste des voix vide, réessai lors de 'onvoiceschanged' ou de la parole.");
+                }
+            } catch (e) {
+                console.error("Erreur lors du chargement des voix:", e);
+            }
+        }
+
+
+        function speak(text, lang = 'ja-JP') {
+            if (!('speechSynthesis' in window)) {
+                showErrorMessage("La synthèse vocale n'est pas supportée par votre navigateur.");
+                return;
+            }
+            
+            window.speechSynthesis.cancel(); 
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = lang;
+            utterance.rate = 0.9;
+
+            let voices = speechSynthesis.getVoices();
+            if (voices.length === 0 && !japaneseVoice) { 
+                console.log("Tentative de chargement des voix pour TTS...");
+                speechSynthesis.onvoiceschanged = () => {
+                    console.log("Événement onvoiceschanged déclenché.");
+                    loadVoices(); 
+                    if (japaneseVoice) {
+                        utterance.voice = japaneseVoice;
+                        console.log("Voix japonaise assignée après onvoiceschanged:", japaneseVoice.name);
+                    } else {
+                        console.warn("Toujours aucune voix japonaise après onvoiceschanged.");
+                    }
+                    window.speechSynthesis.speak(utterance); 
+                };
+                // Pour certains navigateurs, il faut parfois attendre un peu que la liste se peuple
+                // setTimeout(() => {
+                //     if (speechSynthesis.getVoices().length > 0 && !japaneseVoice) loadVoices();
+                //     if (japaneseVoice) utterance.voice = japaneseVoice;
+                //     window.speechSynthesis.speak(utterance);
+                // }, 200);
+                return; 
+            }
+            
+            if (japaneseVoice) {
+                utterance.voice = japaneseVoice;
+                 console.log("Utilisation de la voix japonaise préchargée:", japaneseVoice.name);
+            } else { 
+                let voiceToUse = voices.find(voice => voice.lang === lang);
+                if (!voiceToUse) voiceToUse = voices.find(voice => voice.lang.startsWith('ja'));
+                if (voiceToUse) {
+                    utterance.voice = voiceToUse;
+                    console.log("Voix japonaise trouvée dynamiquement:", voiceToUse.name);
+                } else {
+                    console.warn(`Aucune voix japonaise spécifique trouvée pour TTS. Utilisation de la voix par défaut du navigateur pour ${lang}.`);
+                }
+                 if (voices.length === 0 && !voiceToUse) {
+                     console.warn("Aucune voix de synthèse disponible sur cet appareil.");
+                     showErrorMessage("Aucune voix de synthèse n'est actuellement disponible sur cet appareil.");
+                     return; 
+                 }
+            }
+            
+            utterance.onerror = (event) => {
+                console.error('Erreur de synthèse vocale:', event.error, event);
+                showErrorMessage(`Erreur de synthèse vocale: ${event.error}`);
+            };
+            
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function renderUsefulWords() { 
+            if (!domElements.usefulWordsListDiv) return;
+            domElements.usefulWordsListDiv.innerHTML = ''; 
+            usefulWords.forEach(word => {
+                const p = document.createElement('p'); p.className = 'info-list-item'; p.dataset.id = word.id;
+                if (word.isAISuggestion) p.classList.add('ai-suggestion');
+                const textSpan = document.createElement('span'); textSpan.textContent = `• ${word.text}: ${word.translation}`;
+                const speakerIconPlaceholder = document.createElement('span'); speakerIconPlaceholder.className = 'speaker-icon-placeholder';
+                speakerIconPlaceholder.innerHTML = icons.speaker;
+                speakerIconPlaceholder.title = `Écouter "${word.translation}"`;
+                speakerIconPlaceholder.addEventListener('click', (e) => { e.stopPropagation(); speak(word.translation, word.lang); });
+                p.appendChild(textSpan); p.appendChild(speakerIconPlaceholder);
+                domElements.usefulWordsListDiv.appendChild(p);
+            });
+        }
+        async function suggestNewWords() { 
+             const existingWordsText = usefulWords.map(word => `- ${word.text}: ${word.translation}`).join('\n');
+            const prompt = `Je planifie un voyage au Japon. Voici des mots/phrases que je connais déjà :\n${existingWordsText}\n\nSuggère 3-5 autres mots ou courtes phrases japonaises utiles pour un touriste. Pour chaque suggestion:
+1. Le terme en français.
+2. Sa traduction STRICTEMENT en caractères japonais (Hiragana, Katakana, Kanji uniquement - pas de romaji, pas de notes explicatives dans la traduction).
+Sépare le français et le japonais par un DEUX-POINTS. Ne répète pas les mots existants. Réponds uniquement avec les suggestions au format exact: TERME_FRANCAIS: TRADUCTION_JAPONAISE_PURE. N'utilise pas de formatage markdown comme des astérisques.
+Exemple: Où sont les toilettes ?: トイレはどこですか`;
+            try {
+                const suggestionsText = await generateContentWithGemini(prompt);
+                suggestionsText.split('\n').filter(line => line.trim() !== '' && line.includes(':')).forEach(rawLine => {
+                    const parts = rawLine.split(':');
+                    if (parts.length >= 2) {
+                        const textFr = parts[0].trim().replace(/\*\*/g, '');
+                        const translationJp = parts.slice(1).join(':').trim().replace(/\*\*/g, '');
+                        if (textFr && translationJp && !usefulWords.some(w => w.text.toLowerCase() === textFr.toLowerCase() || w.translation.toLowerCase() === translationJp.toLowerCase())) {
+                            usefulWords.push({ id: generateId('word-ai'), text: textFr, translation: translationJp, isAISuggestion: true, lang: 'ja-JP' });
+                        }
+                    }
+                });
+                renderUsefulWords(); saveData();
+            } catch (error) { console.error("Erreur suggestion mots:", error); }
+        }
+        if(domElements.suggestWordsButton) domElements.suggestWordsButton.addEventListener('click', suggestNewWords);
+
+        function applyTheme(themeNameInput) {
+            let themeClass = themeNameInput;
+            if (themeNameInput && !themeNameInput.startsWith('theme-')) { 
+                themeClass = `theme-${themeNameInput}`;
+            } else if (!themeNameInput) { 
+                themeClass = 'theme-light';
+            }
+            
+            domElements.body.className = ''; 
+            domElements.body.classList.add(themeClass); 
+            localStorage.setItem('japanTripTheme', themeClass); 
+        }
+
+
+        function initIcons() {
+            if(domElements.tabIconChecklist) domElements.tabIconChecklist.innerHTML = icons.checklist;
+            if(domElements.tabIconCities) domElements.tabIconCities.innerHTML = icons.cities;
+            if(domElements.tabIconItinerary) domElements.tabIconItinerary.innerHTML = icons.itinerary;
+            if(domElements.tabIconInfo) domElements.tabIconInfo.innerHTML = icons.info;
+            if(domElements.aiButtonSuggestTaskIconPlaceholder) domElements.aiButtonSuggestTaskIconPlaceholder.innerHTML = icons.sparkle;
+            if(domElements.aiButtonSuggestWordIconPlaceholder) domElements.aiButtonSuggestWordIconPlaceholder.innerHTML = icons.sparkle;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if ('speechSynthesis' in window) {
+                if (speechSynthesis.getVoices().length === 0) {
+                    speechSynthesis.onvoiceschanged = loadVoices;
+                } else {
+                    loadVoices(); 
+                }
+            }
+
+            loadData(); 
+            
+            initIcons(); 
+            setActiveScreen('checklistScreen'); 
+            
+            renderChecklistItems();
+            renderCities();
+            renderUsefulWords(); 
+            renderItinerary(); 
+            
+            populateItineraryCitySelect(); 
+            if(domElements.itineraryStartDateInput) {
+                domElements.itineraryStartDateInput.min = TRIP_START_DATE;
+                domElements.itineraryStartDateInput.max = TRIP_END_DATE;
+            }
+            if(domElements.calculateJrPassButton) { 
+                 domElements.calculateJrPassButton.addEventListener('click', calculateAndDisplayJrPassProfitability);
+            }
+            if(domElements.themeSelect) {
+                domElements.themeSelect.addEventListener('change', (e) => applyTheme(e.target.value));
+                const currentThemeClass = domElements.body.className;
+                if (currentThemeClass.includes('theme-light')) domElements.themeSelect.value = 'light';
+                else if (currentThemeClass.includes('theme-ocean-breeze')) domElements.themeSelect.value = 'ocean-breeze';
+                else if (currentThemeClass.includes('theme-sakura-spring')) domElements.themeSelect.value = 'sakura-spring';
+                else domElements.themeSelect.value = 'dark'; 
+            }
+            if (domElements.closeCityModalButton) domElements.closeCityModalButton.onclick = closeEditCityModal;
+            if (domElements.saveCityModalButton) domElements.saveCityModalButton.onclick = saveCityDetails;
+            window.onclick = function(event) { 
+                if (event.target == domElements.editCityModal) {
+                    closeEditCityModal();
+                }
+            }
+            resetItineraryForm(); 
+
+            updateConversionRateText();
+        });
     </script>
 </body>
 </html>
